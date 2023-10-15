@@ -1,0 +1,48 @@
+<div class="container">
+    <mat-card>
+        <h1 class="text-center">Your Profile Details</h1>
+        <div class="container">
+            <mat-card-content>
+                <div class="container text-center">
+                    <img [src]="userImage" alt="Profile Image" class="profile-image">
+                    <h1 class="mt-2"> {{user!==undefined && getFullName(user)}} </h1>
+                    <h3>{{user!==undefined && user.about}}</h3>
+                </div>
+                <div class="col-md-6 offset-md-3">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <h3>Username</h3>
+                            </div>
+                            <div class="col">
+                                <h3> {{user!==undefined && user.userName}} </h3>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <h3>Phone Number</h3>
+                            </div>
+                            <div class="col">
+                                <h3>+91 {{user!==undefined && user.phoneNumber}}</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <h3>Gender</h3>
+                            </div>
+                            <div class="col">
+                                <h3> {{user!==undefined && user.gender}} </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" mat-raised-button color="primary"(click)="updateUser()" >Update</button>
+                        <button type="submit" mat-raised-button color="primary"(click)="allAddress()" class="ms-2">Addressess</button>
+                    </div>
+                </div>
+            </mat-card-content>
+        </div>
+    </mat-card>
+</div>
+

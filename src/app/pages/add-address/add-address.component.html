@@ -1,0 +1,66 @@
+<div class="container">
+    <h1 class="text-center">Add Address</h1>
+    <form [formGroup] = "addAddressForm" (ngSubmit) = onSubmit()>
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Address Line 1 Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Address Line 1</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName = "addressLine1">
+                    <mat-error *ngIf ="addAddressForm.get('addressLine1')?.hasError('required') && addAddressForm.get('addressLine1')?.touched">AddressLine1 is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Address Line 2 Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Address Line 2</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName="addressLine2">
+                </mat-form-field>
+            </div>
+        </div>      
+        <div class="row">
+            <div class="col-md-6">
+                <!-- City Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>City</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName="city">
+                    <mat-error *ngIf ="addAddressForm.get('city')?.hasError('required') && addAddressForm.get('city')?.touched">City is required</mat-error>
+                </mat-form-field>
+            </div>
+            <div class="col-md-6">
+                <!-- State Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>State</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName="state">
+                    <mat-error *ngIf ="addAddressForm.get('state')?.hasError('required') && addAddressForm.get('state')?.touched">State is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <!-- City Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Country</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName="country">
+                    <mat-error *ngIf ="addAddressForm.get('country')?.hasError('required') && addAddressForm.get('country')?.touched">Country is required</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Postal code Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Postal Code</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName="postalCode">
+                    <mat-error *ngIf ="addAddressForm.get('postalCode')?.hasError('required') && addAddressForm.get('postalCode')?.touched">Postal Code is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div> 
+        <div class="d-flex justify-content-center">
+            <button type="submit" mat-raised-button color="primary" [disabled]="!addAddressForm.valid">Submit</button>
+            <button type="reset" mat-raised-button color="accent" class="ms-2">Reset</button>
+        </div>  
+    </form>
+</div>
