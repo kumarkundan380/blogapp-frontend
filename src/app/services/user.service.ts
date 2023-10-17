@@ -32,8 +32,11 @@ export class UserService {
     return this.httpClient.get<BlogappResponse<BlogappPageableResponse<User[]>>>(`${this.BASE_URL}?pageNumber=${pageNumber}&pageSize=${pageSize}`);
   }
 
-  updateUser(user: User, userId: number) : Observable<BlogappResponse<User>> {
-    return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}`, user);
+  // updateUser(user: User, userId: number) : Observable<BlogappResponse<User>> {
+  //   return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}`, user);
+  // }
+  updateUser(formData: FormData, userId: number) : Observable<BlogappResponse<User>> {
+    return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}`, formData);
   }
 
   updateRoles(userId:number,rolesList:string[]): Observable<BlogappResponse<User>> {

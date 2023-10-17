@@ -44,9 +44,9 @@ export class AuthService {
     localStorage.removeItem("userInfo");
   }
 
-  isAdminUser(user:any): boolean {
-    const role = user.roles.find((role: any) => role?.roleName ==='ADMIN');
-    if(role === undefined || role === '' || role === null){
+  isAdminUser(user:User): boolean {
+    const role = user.roles!.find((role: any) => role?.roleName ==='ADMIN');
+    if(role === undefined  || role === null){
       return false;
     }
     return true;

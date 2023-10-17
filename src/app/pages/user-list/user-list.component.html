@@ -1,1 +1,60 @@
-<p>user-list works!</p>
+<div class="container">
+    <table *ngIf="users!==undefined && users.content.length > 0" class="table table-hover table-borderless">
+        <thead>
+            <tr>
+                <th>S. No.</th>  
+                <th>User Id</th>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Gender</th>
+                <th>Is Verifyed</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let user of users.content;index as i">
+                <td> {{(users.pageSize*users.pageNumber)+i+1}} </td>
+                <td> {{user.userId}} </td>
+                <td> {{user.userName}} </td>
+                <td> {{getFullName(user)}} </td> 
+                <td> {{user.phoneNumber}} </td>
+                <td> {{user.gender}} </td>
+                <td>
+                    <span  class="badge" [ngClass] = "user.isVerified ? 'bg-success' : 'bg-danger'">{{user.isVerified?'YES':'NO'}} </span>      
+                </td>
+                <td> 
+                    <span class="badge" [ngClass] = "user.userStatus=='ACTIVE'? 'bg-success' : 'bg-danger'">{{user.userStatus}} </span>
+                </td>
+                <td>
+                    <button mat-icon-button color="accent" (click)="updateUser(user)">
+                        <mat-icon>open_in_new</mat-icon>
+                    </button>
+                    <button mat-icon-button [disabled]="user.userStatus=='DELETED'" color="warn" (click)="deleteUser(user)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td> 
+            </tr>
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center">
+        <nav *ngIf="users!==undefined && users.content.length > 0" aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item" [ngClass]="users.isFirst?'disabled':'' ">
+                    <a class="page-link" (click)="onPageChange(users.pageNumber-1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo; Previous</span>
+                    </a>
+                </li>
+                <li *ngFor="let page of [].constructor(users.totalPages); index as i" class="page-item">
+                    <a class="page-link" (click)="onPageChange(i)">{{i+1}}</a>
+                </li>
+                <li class="page-item" [ngClass]="users.isLast?'disabled':'' ">
+                    <a class="page-link" (click)="onPageChange(users.pageNumber+1)" aria-label="Next">
+                        <span aria-hidden="true">Next &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

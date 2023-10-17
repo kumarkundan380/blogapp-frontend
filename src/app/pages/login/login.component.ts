@@ -48,7 +48,7 @@ export class LoginComponent {
       this.authService.logInStatusSubject.next(true);
       this.logInForm.reset();
       if(this.authService.isAdminUser(data.body.user)) {
-        this.router.navigate(['/admin-dashboard']);
+        this.router.navigate(['/admin']);
       } else {
         this.router.navigate(['/user-dashboard']);
       }

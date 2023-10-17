@@ -30,16 +30,12 @@ const routes: Routes = [
     canActivate: [LoginGuard],
   },
   {
-    path: 'admin-dashboard',
+    path: 'admin',
     component: AdminDashboardComponent,
     canActivate: [AdminGuard],
     children: [
       {
-        path:'profile',
-        component: ProfileComponent,
-      },
-      {
-        path:'user-list',
+        path:'',
         component: UserListComponent
       },
       {
