@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { User } from 'src/app/model/user';
+import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 
 
@@ -11,7 +12,7 @@ import { UserService } from 'src/app/services/user.service';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnInit,OnDestroy {
 
   signUpForm!: FormGroup;
   user!: User;
@@ -19,7 +20,8 @@ export class SignupComponent implements OnInit {
   file!:Blob;
   imageSrc: string | ArrayBuffer | null | undefined = null;
 
-  constructor(private userService : UserService, 
+  constructor(private userService : UserService,
+    private authService: AuthService, 
     private router: Router,
     private formBuilder: FormBuilder,
     private _snackBar: MatSnackBar){
@@ -27,6 +29,8 @@ export class SignupComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.authService.showSignupButtonSubject.next(false);
+    this.authService.showLoginButtonSubject.next(true);
     this.imageSrc = "../../../assets/logo.jpg";
     this.signUpForm = this.formBuilder.group({
       userName: new FormControl('',[Validators.required, Validators.email]),
@@ -86,6 +90,10 @@ export class SignupComponent implements OnInit {
         })
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.authService.showLoginButtonSubject.next(true);
   }
 
 }

@@ -21,6 +21,7 @@ export class UpdateUserComponent implements OnInit {
   imageSrc: string | ArrayBuffer | null | undefined = null;
   isAdmin!:boolean;
   userVerified!:string;
+  profileImage!:string;
 
   constructor(private activateRoute: ActivatedRoute,
     private authService : AuthService,
@@ -33,6 +34,7 @@ export class UpdateUserComponent implements OnInit {
 
   ngOnInit(): void {
     this.imageSrc = "../../../assets/profile.png";
+    this.profileImage = "../../../assets/profile.png";
     this.userId = this.activateRoute.snapshot.params['userId'];
     this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
     this.userService.getUser(this.userId).subscribe({
@@ -63,6 +65,7 @@ export class UpdateUserComponent implements OnInit {
         }
         if(this.user.userImage){
           this.imageSrc = this.user.userImage;
+          this.profileImage = this.user.userImage;
         }
       },
       error: (error) => {
@@ -143,6 +146,14 @@ export class UpdateUserComponent implements OnInit {
     formData.append("userData",JSON.stringify(this.user));
     this.userService.updateUser(formData,this.userId).subscribe({
       next: (data) => {
+          this.user = data.body;
+          if(this.authService.isSameUser(data.body.userId!)){
+            this.authService.setUser(JSON.stringify(data.body))
+            if(data.body.userImage){
+              this.authService.profileImageSubject.next(data.body.userImage!);
+            }
+            
+          }
           this._snackBar.open(data.message, "OK", {
           duration: 3000,
           verticalPosition: 'top'

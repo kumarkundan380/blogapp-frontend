@@ -11,7 +11,7 @@ import { UserService } from 'src/app/services/user.service';
   templateUrl: './address.component.html',
   styleUrls: ['./address.component.css']
 })
-export class AddressComponent implements OnInit{
+export class AddressComponent implements OnInit {
 
   addressess!: Address[];
   userId!: number;

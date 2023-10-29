@@ -1,0 +1,10 @@
+.main{
+    display: inline;
+}
+.left {
+    float: left;
+}
+.right {
+    float: right;
+    text-align: center;
+}

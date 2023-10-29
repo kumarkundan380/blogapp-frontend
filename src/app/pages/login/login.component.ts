@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -10,10 +10,12 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
 
   logInForm!: FormGroup;
   loginRequest!: LoginRequest;
+  isLoggedIn!: boolean;
+  profileImage!: string;
 
   constructor(private authService : AuthService, 
     private router: Router,
@@ -23,6 +25,9 @@ export class LoginComponent {
   }
 
   ngOnInit(): void {
+    this.authService.showLoginButtonSubject.next(false);
+    this.authService.showSignupButtonSubject.next(true);
+    this.profileImage = "../../../assets/profile.png";
     this.logInForm = this.formBuilder.group({
       userName: new FormControl('', Validators.required),
 	    password: new FormControl('', Validators.required),
@@ -40,12 +45,16 @@ export class LoginComponent {
   logIn(){
     this.authService.loginUser(this.loginRequest).subscribe({
       next: (data) => {
+        this.authService.setUserInfo(data.body);
+        this.authService.logInStatusSubject.next(true);
+        if(data.body.user.userImage){
+          this.authService.profileImageSubject.next(data.body.user.userImage);
+          //this.profileImage = data.body.user.userImage;
+        } 
         this._snackBar.open(data.message, "OK", {
         duration: 3000,
         verticalPosition: 'top'
       })
-      this.authService.setUserInfo(data.body);
-      this.authService.logInStatusSubject.next(true);
       this.logInForm.reset();
       if(this.authService.isAdminUser(data.body.user)) {
         this.router.navigate(['/admin']);
@@ -54,10 +63,12 @@ export class LoginComponent {
       }
     },
       error: (error) => {
+        this.authService.logInStatusSubject.next(false);
         this._snackBar.open(error?.error?.errorMessage, "OK", {
         duration: 3000,
         verticalPosition: 'top'
-      })}      
+      })
+    }      
     }); 
   }
 
@@ -66,6 +77,10 @@ export class LoginComponent {
       userName: new FormControl('', Validators.required),
 	    password: new FormControl('', Validators.required),
     });
+  }
+
+  ngOnDestroy(): void {
+    this.authService.showLoginButtonSubject.next(true);
   }
 
 

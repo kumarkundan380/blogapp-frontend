@@ -1,0 +1,71 @@
+<div class="container">
+    <h1 class="text-center"> Update Post</h1>
+    <form [formGroup] = "updatePostForm" (ngSubmit) = onSubmit()>
+        <ng-template [ngIf]="post && post.imageUrl">
+            <div class="row">
+                <!-- User Status Field-->
+                <div class="col-md-12">
+                    <img [src]="post.imageUrl" class="img-fluid post-image" alt="Post Image">
+                </div>
+            </div>    
+        </ng-template> 
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-center mt-3 mb-5">
+                    <input type="file" class="file-input"
+                    (change)="onFileSelected($event)">
+                </div>
+            </div>
+        </div>       
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Post Title Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Post Title</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName = "postTitle">
+                    <mat-error *ngIf ="updatePostForm.get('postTitle')?.hasError('required') && updatePostForm.get('postTitle')?.touched">Post Title is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-12">
+                <ckeditor
+                    [editor]="Editor" 
+                    data="<p>Enter Here</p>"
+                    name="postContent"
+                    formControlName = "postContent">
+                </ckeditor>
+                <mat-error *ngIf ="updatePostForm.get('postContent')?.hasError('required') && updatePostForm.get('postContent')?.touched">Post Content is required</mat-error>
+            </div>
+        </div>      
+        <div class="row mt-3">
+            <div class="col-md-12"> 
+                <!-- Post Category Field-->
+                <mat-form-field class="w-100" appearance="outline"> 
+                    <mat-label>Select Category</mat-label>
+                    <mat-select formControlName="categoryId" >
+                        <mat-option *ngFor="let category of categories" [value]="category.categoryId">{{category.categoryTitle}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf ="updatePostForm.get('categoryId')?.hasError('required') && updatePostForm.get('categoryId')?.touched">Post Category is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <ng-template [ngIf]="isAdmin">
+            <div class="row mt-3">
+                <!-- Post Status Field-->
+                <mat-form-field class="w-100" appearance="outline"> 
+                    <mat-label>Update Status</mat-label>
+                    <mat-select formControlName="status" >
+                        <mat-option *ngFor="let status of statusList" [value]="status">{{status}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf ="updatePostForm.get('status')?.hasError('required') && updatePostForm.get('status')?.touched">Post Status is required</mat-error>
+                </mat-form-field>
+            </div>    
+        </ng-template> 
+        <div class="d-flex justify-content-center">
+            <button type="submit" mat-raised-button color="primary" [disabled]="!updatePostForm.valid">Submit</button>
+            <button type="reset" mat-raised-button color="accent" class="ms-2">Reset</button>
+        </div>  
+    </form>
+</div>

@@ -13,9 +13,21 @@ import { LoginGuard } from './guards/login.guard';
 import { AddAddressComponent } from './pages/add-address/add-address.component';
 import { AddressComponent } from './pages/address/address.component';
 import { EditAddressComponent } from './pages/edit-address/edit-address.component';
+import { CategoriesComponent } from './pages/categories/categories.component';
+import { AddCategoryComponent } from './pages/add-category/add-category.component';
+import { UpdateCategoryComponent } from './pages/update-category/update-category.component';
+import { PostsComponent } from './pages/posts/posts.component';
+import { CreatePostComponent } from './pages/create-post/create-post.component';
+import { UpdatePostComponent } from './pages/update-post/update-post.component';
+import { PostPreviewComponent } from './pages/post-preview/post-preview.component';
+import { HomePageComponent } from './pages/home-page/home-page.component';
 
 
 const routes: Routes = [
+  {
+    path: '',
+    component: HomePageComponent
+  },
   {
     path: 'signup',
     component: SignupComponent
@@ -23,6 +35,10 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+  },
+  {
+    path: 'posts/:postId',
+    component: PostPreviewComponent
   },
   {
     path:'profile',
@@ -41,6 +57,22 @@ const routes: Routes = [
       {
         path:':userId/roles',
         component: RolesComponent
+      },
+      {
+        path:'categories',
+        component: CategoriesComponent
+      },
+      {
+        path:'add-category',
+        component: AddCategoryComponent
+      },
+      {
+        path:'update-category/:categoryId',
+        component: UpdateCategoryComponent
+      },
+      {
+        path:'posts',
+        component: PostsComponent
       }
     ]
   },
@@ -67,6 +99,15 @@ const routes: Routes = [
   {
     path: 'address/:userId/:addressId',
     component: EditAddressComponent,
+    canActivate: [LoginGuard]
+  },
+  {
+    path:'create-post',
+    component: CreatePostComponent,
+  },
+  {
+    path:'update-post/:postId',
+    component: UpdatePostComponent,
     canActivate: [LoginGuard]
   }
 ];

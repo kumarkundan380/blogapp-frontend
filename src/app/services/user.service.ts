@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { Address } from '../model/address';
 import { BlogappPageableResponse } from '../model/blogapp-pageable-response';
 import { BlogappResponse } from '../model/blogapp-response';
+import { Role } from '../model/role';
 import { User } from '../model/user';
 
 @Injectable({
@@ -39,7 +40,12 @@ export class UserService {
     return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}`, formData);
   }
 
-  updateRoles(userId:number,rolesList:string[]): Observable<BlogappResponse<User>> {
+  getAllRoles(): Observable<BlogappResponse<Role[]>> {
+    return this.httpClient.get<BlogappResponse<Role[]>>(`${this.BASE_URL}/roles`);
+  }
+
+
+  updateRoles(userId:number,rolesList:Role[]): Observable<BlogappResponse<User>> {
     return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}/roles`,rolesList);
   }
 
@@ -67,5 +73,6 @@ export class UserService {
   deleteAddress(userId: number, addressId:number) : Observable<BlogappResponse<void>> {
     return this.httpClient.delete<BlogappResponse<void>>(`${this.BASE_URL}/${userId}/address/${addressId}`);
   }
+
 
 }

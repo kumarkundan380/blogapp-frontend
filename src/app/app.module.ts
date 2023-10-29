@@ -28,6 +28,15 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgxUiLoaderModule,NgxUiLoaderHttpModule } from 'ngx-ui-loader';
 import { AddAddressComponent } from './pages/add-address/add-address.component';
 import { EditAddressComponent } from './pages/edit-address/edit-address.component';
+import { CategoriesComponent } from './pages/categories/categories.component';
+import { AddCategoryComponent } from './pages/add-category/add-category.component';
+import { UpdateCategoryComponent } from './pages/update-category/update-category.component';
+import { PostsComponent } from './pages/posts/posts.component';
+import { CreatePostComponent } from './pages/create-post/create-post.component';
+import { UpdatePostComponent } from './pages/update-post/update-post.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { HomePageComponent } from './pages/home-page/home-page.component';
+import { PostPreviewComponent } from './pages/post-preview/post-preview.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +56,15 @@ import { EditAddressComponent } from './pages/edit-address/edit-address.componen
     UserListComponent,
     SignupComponent,
     AddAddressComponent,
-    EditAddressComponent
+    EditAddressComponent,
+    CategoriesComponent,
+    AddCategoryComponent,
+    UpdateCategoryComponent,
+    PostsComponent,
+    CreatePostComponent,
+    UpdatePostComponent,
+    HomePageComponent,
+    PostPreviewComponent
   ],
   imports: [
     BrowserModule,
@@ -60,6 +77,7 @@ import { EditAddressComponent } from './pages/edit-address/edit-address.componen
     MaterialModule,
     HttpClientModule,
     NgxUiLoaderModule,
+    CKEditorModule,
     NgxUiLoaderHttpModule.forRoot({ showForeground: true })
   ],
   providers: [

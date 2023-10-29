@@ -1,0 +1,22 @@
+<div class="container">
+    <a [routerLink]="'/'">Home</a>
+    <div class="card mt-5">
+        <div class="card-header">
+          <p>Posted by <b>{{getFullName(post)}}</b> on <b>{{post.createdAt | date: 'dd/MM/yyyy'}}</b></p>
+          <p class="text-muted"> Category: {{post.category?.categoryTitle}}</p>
+        </div>
+        <div class="card-body">
+            <p class="fs-3 mt-2 ms-lg-2">{{post.postTitle}}</p>
+            <ng-template [ngIf]="post.imageUrl">
+                <div class="mt-3">
+                    <img [src]="post.imageUrl" class="card-img-top post-image" alt="Post Image">
+                </div>
+            </ng-template>
+            <p class="card-text mt-3" [innerHTML]="post.postContent"></p>
+        </div>
+        <div class="card-footer">
+            <mat-icon class="ms-1">thumb_up</mat-icon>0
+            <mat-icon class="ms-3">thumb_down</mat-icon>0
+        </div>
+      </div>
+</div>

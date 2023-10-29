@@ -8,42 +8,76 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit,OnDestroy {
 
-  isLoggedIn: boolean = false;
-  userName: string = '';
-  backgroundImage:string = '../../../assets/profile.png';
+  isLoggedIn!:boolean;
+  showLoginButton!:boolean;
+  showSignupButton!:boolean;
+  userName!:string;
+  //backgroundImage:string = '../../../assets/profile.png';
+  profileImage!:string;
   logInSubscription!:Subscription
+  profileImageSubscription!:Subscription;
   
-   constructor(public authService : AuthService, private router : Router){}
-  
+  constructor(public authService : AuthService, private router : Router){}
   
 
   ngOnInit(): void {
-    this.logInSubscription = this.authService.logInStatusSubject.asObservable().subscribe(data => {
+    // this.logInSubscription = this.authService.logInStatusSubject.asObservable().subscribe(data => {
+    //   this.isLoggedIn = data;
+    //   if(this.isLoggedIn){
+    //     this.userName = this.authService.getUserInfo().userName;
+    //   }
+    // });
+    this.authService.showLoginButtonSubject.subscribe(data => {
+      this.showLoginButton=data
+    })
+    this.authService.showSignupButtonSubject.subscribe(data => {
+      this.showSignupButton = data;
+    })
+    this.authService.logInStatusSubject.subscribe(data => {
       this.isLoggedIn = data;
       if(this.isLoggedIn){
         this.userName = this.authService.getUserInfo().userName;
       }
     });
     this.isLoggedIn = this.authService.isLoggedIn();
+    // this.profileImageSubscription = this.authService.profileImageSubject.asObservable().subscribe(data => {
+    //   this.profileImage = data;
+    // })
+    this.authService.profileImageSubject.subscribe(data => {
+      this.profileImage = data;
+    })
     if(this.isLoggedIn){
       this.userName = this.authService.getUserInfo().userName;
     }
     if(this.authService.getUserInfo()?.userImage) {
-      this.backgroundImage = this.authService.getUserInfo().userImage!;
+      this.profileImage = this.authService.getUserInfo().userImage!;
     }
   }
 
   logOut():void {
     this.authService.logout();
-    this.authService.logInStatusSubject.next(false);
+    this.isLoggedIn = false;
+    this.authService.logInStatusSubject.next(this.isLoggedIn);
+    this.authService.profileImageSubject.next(this.profileImage);
     this.isLoggedIn = this.authService.isLoggedIn();
     this.router.navigate(['/']);
   }
 
+  logIn(){
+    this.authService.showLoginButtonSubject.next(false);
+    this.router.navigate([`/login`])
+  }
+
+  signUp() {
+    this.authService.showSignupButtonSubject.next(false);
+    this.router.navigate(['/signup']);
+  }
+
   ngOnDestroy(): void {
-    this.logInSubscription.unsubscribe();
+    this.authService.showSignupButtonSubject.next(true);
+    this.authService.showLoginButtonSubject.next(true);
   }
 
 

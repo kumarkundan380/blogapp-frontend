@@ -1,0 +1,51 @@
+<div class="container">
+    <h1 class="text-center"> Create Post</h1>
+    <form [formGroup] = "createPostForm" (ngSubmit) = onSubmit()>
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Post Title Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Post Title</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName = "postTitle">
+                    <mat-error *ngIf ="createPostForm.get('postTitle')?.hasError('required') && createPostForm.get('postTitle')?.touched">Post Title is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-center mt-3 mb-5">
+                    <input type="file" class="file-input"
+                    (change)="onFileSelected($event)">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <ckeditor
+                    [editor]="Editor" 
+                    data="<p>Hello, world!</p>"
+                    name="postContent"
+                    formControlName = "postContent" >
+                </ckeditor>
+                <mat-error *ngIf ="createPostForm.get('postContent')?.hasError('required') && createPostForm.get('postContent')?.touched">Post Content is required</mat-error>
+            </div>
+        </div>      
+        <div class="row mt-3">
+            <div class="col-md-12"> 
+                <!-- Post Category Field-->
+                <mat-form-field class="w-100" appearance="outline"> 
+                    <mat-label>Select Category</mat-label>
+                    <mat-select formControlName="categoryId" >
+                        <mat-option *ngFor="let category of categories" [value]="category.categoryId">{{category.categoryTitle}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf ="createPostForm.get('categoryId')?.hasError('required') && createPostForm.get('categoryId')?.touched">Post Category is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button type="submit" mat-raised-button color="primary" [disabled]="!createPostForm.valid">Submit</button>
+            <button type="reset" mat-raised-button color="accent" class="ms-2">Reset</button>
+        </div>  
+    </form>
+</div>

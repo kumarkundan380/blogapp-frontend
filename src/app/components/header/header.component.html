@@ -1,13 +1,13 @@
 <p>
     <mat-toolbar color="accent">
-      <a mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon" [routerLink]="'/'">
+      <a mat-icon-button class="example-icon" aria-label="con-button with menu icon" [routerLink]="'/'">
         <mat-icon>book_menu</mat-icon>
       </a>
       <span> Blog App</span>
       <span class="example-spacer"></span>
-        <a *ngIf="!isLoggedIn" mat-flat-button color="primary" class="ms-2" [routerLink]="'/login'" >Login</a>
+        <a *ngIf="showLoginButton && !isLoggedIn" mat-flat-button color="primary" class="ms-2" (click)="logIn()" >Login</a>
         <a *ngIf="isLoggedIn" mat-flat-button color="primary" class="ms-2" (click)="logOut()" >Logout</a>
-        <a *ngIf="!isLoggedIn" mat-flat-button color="primary" class="ms-2" [routerLink]="'/signup'">Register</a>
-        <a *ngIf="isLoggedIn" class="profile"  [ngStyle]="{'background-image': 'url(' + backgroundImage + ')'}" [routerLink]="'/profile'"></a> 
+        <a *ngIf="showSignupButton && !isLoggedIn" mat-flat-button color="primary" class="ms-2" (click)="signUp()" >Register</a>
+        <a *ngIf="isLoggedIn" class="profile"  [ngStyle]="{'background-image': 'url(' + profileImage + ')'}" [routerLink]="'/profile'"></a> 
     </mat-toolbar>
 </p>

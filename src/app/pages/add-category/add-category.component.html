@@ -1,0 +1,29 @@
+<div class="container">
+    <h1 class="text-center">Add Category</h1>
+    <form [formGroup] = "addCategoryForm" (ngSubmit) = onSubmit()>
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Category Title Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Category Title</mat-label>
+                    <input matInput placeholder="Enter Here" formControlName = "categoryTitle">
+                    <mat-error *ngIf ="addCategoryForm.get('categoryTitle')?.hasError('required') && addCategoryForm.get('categoryTitle')?.touched">Category Title is required</mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Category Description Field -->
+                <mat-form-field class="w-100" appearance="outline">
+                    <mat-label>Category Description</mat-label>
+                    <textarea matInput placeholder="Enter Here" formControlName="categoryDescription"></textarea>
+                    <mat-error *ngIf ="addCategoryForm.get('categoryDescription')?.hasError('required') && addCategoryForm.get('categoryDescription')?.touched">Category Description is required</mat-error>
+                </mat-form-field>  
+            </div>
+        </div>      
+        <div class="d-flex justify-content-center">
+            <button type="submit" mat-raised-button color="primary" [disabled]="!addCategoryForm.valid">Submit</button>
+            <button type="reset" mat-raised-button color="accent" class="ms-2">Reset</button>
+        </div>  
+    </form>
+</div>
