@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { BlogappPageableResponse } from '../model/blogapp-pageable-response';
 import { BlogappResponse } from '../model/blogapp-response';
 import { Post } from '../model/post';
+import { Comment } from '../model/comment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ import { Post } from '../model/post';
 export class PostService {
 
   private BASE_URL = "http://localhost:8080/api/v1/posts";
+  private BASE_URL_COMMENT = "http://localhost:8080/api/v1/comments";
 
   constructor(private httpClient : HttpClient) { }
 
@@ -45,5 +47,19 @@ export class PostService {
   deletePost(postId:number): Observable<BlogappResponse<void>> {
     return this.httpClient.delete<BlogappResponse<void>>(`${this.BASE_URL}/${postId}`,);
   }
+
+  addComment(comment: Comment) : Observable<BlogappResponse<Comment>> {
+    return this.httpClient.post<BlogappResponse<Comment>>(`${this.BASE_URL_COMMENT}`,comment);
+
+  }
+
+  deleteComment(commentId:number): Observable<BlogappResponse<void>> {
+    return this.httpClient.delete<BlogappResponse<void>>(`${this.BASE_URL_COMMENT}/${commentId}`);
+  }
+
+  updateComment(comment: Comment, commentId: number) : Observable<BlogappResponse<Comment>> {
+    return this.httpClient.put<BlogappResponse<Comment>>(`${this.BASE_URL_COMMENT}/${commentId}`, comment);
+  }
+
 
 }

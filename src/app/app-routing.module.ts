@@ -20,13 +20,13 @@ import { PostsComponent } from './pages/posts/posts.component';
 import { CreatePostComponent } from './pages/create-post/create-post.component';
 import { UpdatePostComponent } from './pages/update-post/update-post.component';
 import { PostPreviewComponent } from './pages/post-preview/post-preview.component';
-import { HomePageComponent } from './pages/home-page/home-page.component';
+import { AdminHomeComponent } from './pages/admin-home/admin-home.component';
 
 
 const routes: Routes = [
   {
     path: '',
-    component: HomePageComponent
+    component: PostsComponent
   },
   {
     path: 'signup',
@@ -52,11 +52,19 @@ const routes: Routes = [
     children: [
       {
         path:'',
+        component: AdminHomeComponent
+      },
+      {
+        path:'user-list',
         component: UserListComponent
       },
       {
         path:':userId/roles',
         component: RolesComponent
+      },
+      {
+        path:'profile',
+        component: ProfileComponent,
       },
       {
         path:'categories',

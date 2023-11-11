@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Post } from 'src/app/model/post';
+import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
 import { PostService } from 'src/app/services/post.service';
 
@@ -13,15 +14,18 @@ import { PostService } from 'src/app/services/post.service';
 export class PostsComponent implements OnInit{
 
   posts!: Post[];
+  isAdmin!: boolean;
 
   constructor(private postService : PostService, 
     private router: Router,
+    private authService: AuthService,
     private _snackBar: MatSnackBar,
     private dialogService: DialogService){
   }
 
   ngOnInit(): void {
     this.getAllPosts();
+    this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
   }
 
   getAllPosts(){

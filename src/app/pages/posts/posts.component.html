@@ -10,15 +10,17 @@
                             <p [innerHTML]="(post.postContent.length>50)? (post.postContent | slice:0:50)+'...':(post.postContent)"></p>
                             <button mat-raised-button color="primary"(click)="readMore(post)" class="ms-2">Read More</button>
                         </div>
-                        <div class="right">
-                            <span class="badge" [ngClass] = "post.status=='APPROVED'? 'bg-success' : post.status=='PENDING' ?'bg-warning':'bg-danger'">{{post.status}} </span>
-                            <button mat-icon-button color="accent" (click)="updatePost(post)">
-                                <mat-icon>open_in_new</mat-icon>
-                            </button>
-                            <button mat-icon-button color="warn" (click)="deletePost(post)">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </div>
+                        <ng-template [ngIf] = "isAdmin">
+                            <div class="right">
+                                <span class="badge" [ngClass] = "post.status=='APPROVED'? 'bg-success' : post.status=='PENDING' ?'bg-warning':'bg-danger'">{{post.status}} </span>
+                                <button mat-icon-button color="accent" (click)="updatePost(post)">
+                                    <mat-icon>open_in_new</mat-icon>
+                                </button>
+                                <button [disabled]="post.status=='DELETED'" mat-icon-button color="warn" (click)="deletePost(post)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </ng-template>    
                     </div>
                     
                 </div>

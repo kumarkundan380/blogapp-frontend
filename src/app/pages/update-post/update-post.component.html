@@ -38,20 +38,21 @@
                 </ckeditor>
                 <mat-error *ngIf ="updatePostForm.get('postContent')?.hasError('required') && updatePostForm.get('postContent')?.touched">Post Content is required</mat-error>
             </div>
-        </div>      
-        <div class="row mt-3">
-            <div class="col-md-12"> 
-                <!-- Post Category Field-->
-                <mat-form-field class="w-100" appearance="outline"> 
-                    <mat-label>Select Category</mat-label>
-                    <mat-select formControlName="categoryId" >
-                        <mat-option *ngFor="let category of categories" [value]="category.categoryId">{{category.categoryTitle}}</mat-option>
-                    </mat-select>
-                    <mat-error *ngIf ="updatePostForm.get('categoryId')?.hasError('required') && updatePostForm.get('categoryId')?.touched">Post Category is required</mat-error>
-                </mat-form-field>
-            </div>
         </div>
+          
         <ng-template [ngIf]="isAdmin">
+            <div class="row mt-3">
+                <div class="col-md-12"> 
+                    <!-- Post Category Field-->
+                    <mat-form-field class="w-100" appearance="outline"> 
+                        <mat-label>Select Category</mat-label>
+                        <mat-select formControlName="categoryId" >
+                            <mat-option *ngFor="let category of categories" [value]="category.categoryId">{{category.categoryTitle}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf ="updatePostForm.get('categoryId')?.hasError('required') && updatePostForm.get('categoryId')?.touched">Post Category is required</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
             <div class="row mt-3">
                 <!-- Post Status Field-->
                 <mat-form-field class="w-100" appearance="outline"> 

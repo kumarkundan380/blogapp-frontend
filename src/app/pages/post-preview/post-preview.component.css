@@ -6,3 +6,18 @@
     margin-right: auto;
     
 }
+
+.badgeButton {
+    cursor: pointer;
+}
+
+.right {
+    float: right;
+    text-align: center;
+}
+
+.link {
+    color: blue;
+    text-decoration: underline !important;
+    cursor: pointer;
+  }

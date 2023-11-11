@@ -35,7 +35,6 @@ import { PostsComponent } from './pages/posts/posts.component';
 import { CreatePostComponent } from './pages/create-post/create-post.component';
 import { UpdatePostComponent } from './pages/update-post/update-post.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { HomePageComponent } from './pages/home-page/home-page.component';
 import { PostPreviewComponent } from './pages/post-preview/post-preview.component';
 
 @NgModule({
@@ -63,7 +62,6 @@ import { PostPreviewComponent } from './pages/post-preview/post-preview.componen
     PostsComponent,
     CreatePostComponent,
     UpdatePostComponent,
-    HomePageComponent,
     PostPreviewComponent
   ],
   imports: [

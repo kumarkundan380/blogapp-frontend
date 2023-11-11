@@ -60,7 +60,7 @@ export class AuthService {
   }
 
   isAdminUser(user:User): boolean {
-    const role = user.roles!.find((role: Role) => role?.roleName ==='ADMIN');
+    const role = user?.roles!.find((role: Role) => role?.roleName ==='ADMIN');
     if(role === undefined  || role === null){
       return false;
     }
