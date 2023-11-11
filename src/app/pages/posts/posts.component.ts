@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { BlogappPageableResponse } from 'src/app/model/blogapp-pageable-response';
 import { Post } from 'src/app/model/post';
 import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
@@ -13,7 +14,8 @@ import { PostService } from 'src/app/services/post.service';
 })
 export class PostsComponent implements OnInit{
 
-  posts!: Post[];
+
+  posts!: BlogappPageableResponse<Post[]>;
   isAdmin!: boolean;
 
   constructor(private postService : PostService, 
@@ -24,14 +26,18 @@ export class PostsComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.getAllPosts();
     this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
+    if(this.isAdmin) {
+      this.getAllPosts();
+    } else {
+      this.getAllApprovedPost();
+    }
   }
 
   getAllPosts(){
     this.postService.getAllPost().subscribe({
       next: (data) => {
-        this.posts = data.body.content
+        this.posts = data.body
       },
       error: (error) => {
         this._snackBar.open(error.error.errorMessage, "OK", {
@@ -39,7 +45,22 @@ export class PostsComponent implements OnInit{
           verticalPosition: 'top'
         })
       }
-    })
+    });
+  } 
+    
+  
+  getAllApprovedPost(){
+    this.postService.getAllApprovedPost().subscribe({
+      next: (data) => {
+        this.posts = data.body
+      },
+      error: (error) => {
+        this._snackBar.open(error.error.errorMessage, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+      }
+    });
   }
 
   createPost(): void {
@@ -76,6 +97,36 @@ export class PostsComponent implements OnInit{
   readMore(post: Post){
     this.router.navigate([`/posts/${post.postId}`]);
   }
+
+  onPageChange(pageNumber: number): void {
+    if(this.isAdmin) {
+      this.postService.getAllPost(pageNumber).subscribe({
+        next: (data) =>{
+          this.posts = data.body
+        },
+        error: (error) => {
+          this._snackBar.open(error.error.errorMessage, "OK", {
+            duration: 3000,
+            verticalPosition: 'top'
+          })
+        }
+      });
+    } else {
+      this.postService.getAllApprovedPost(pageNumber).subscribe({
+        next: (data) =>{
+          this.posts = data.body
+        },
+        error: (error) => {
+          this._snackBar.open(error.error.errorMessage, "OK", {
+            duration: 3000,
+            verticalPosition: 'top'
+          })
+        }
+      });
+    }
+    
+  }
+
 
 
 }

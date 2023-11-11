@@ -149,7 +149,7 @@ export class UpdatePostComponent {
           verticalPosition: 'top'
         })
         this.updatePostForm.reset();
-        this.router.navigate([`admin/posts`])
+        this.goToHomePage();
       },
       error: (error) => {
         this._snackBar.open(error.error.errorMessage, "OK", {
@@ -158,6 +158,14 @@ export class UpdatePostComponent {
         })
       }
     });
+  }
+
+  goToHomePage() {
+    if(this.isAdmin) {
+      this.router.navigate([`/admin`])
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
 

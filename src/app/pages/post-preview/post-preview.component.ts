@@ -91,7 +91,7 @@ export class PostPreviewComponent implements OnInit{
               verticalPosition: 'top'
             })
             this.getPost(this.postId);
-            this.router.navigate([`/admin/posts`]);
+            this.goToHomePage();
           },
           error: (error) => {
             this._snackBar.open(error.error.errorMessage, "OK", {

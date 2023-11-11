@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from 'src/app/model/role';
 import { UserService } from 'src/app/services/user.service';
 
@@ -13,28 +13,32 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class RolesComponent implements OnInit {
 
-  roleList:any = new FormControl('');
-  updateRole!: FormGroup;
+  roles:any = new FormControl('');
+  roleList!: Role[];
   userId!: number;
-  roles! :Role[];
+  useUpdatedRole!: Role[];
+  userRole!: Role[];
+  roleIds!: number[];
+  roleName!: string[];
+  haveUserRole!: boolean;
+
+
 
   constructor(private userService: UserService,
+    private router: Router,
     private activateRoute: ActivatedRoute, 
-    private formBuilder: FormBuilder,
     private _snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.userId = this.activateRoute.snapshot.params['userId'];
-    this.updateRole = this.formBuilder.group({
-      roleList: new FormControl('')
-    });
     this.getAllRoles();
+    this.getUserRole();
   }
 
   getAllRoles(){
     this.userService.getAllRoles().subscribe({
       next: (data) => {
-        this.roles = data.body.map(role => role);
+        this.roleList = data.body.map(role => role);
       },
       error: (error) => {
         this._snackBar.open(error.error.errorMessage, "OK", {
@@ -45,19 +49,41 @@ export class RolesComponent implements OnInit {
     })
   }
 
-
-  onSubmit(){
-    console.log(this.roles);
-    console.log(this.roleList.value?.[0]);
-    console.log(typeof(this.roleList.value?.[0]));
-    console.log(this.roleList.value?.[0]?.['roleName']);
-
-    this.userService.updateRoles(this.userId,this.roleList.value).subscribe({
+  getUserRole(){
+    this.userService.getUser(this.userId).subscribe({
       next: (data) => {
-          this._snackBar.open(data.message, "OK", {
+        this.userRole = data.body?.roles!.map(role => role);
+        this.roles.setValue(this.userRole);
+        this.roleIds = this.userRole.map(role => role.roleId!);
+        this.roleName = this.userRole.map(role => role.roleName);
+        this.haveUserRole = this.roleName.includes("USER");
+        this.roleList = this.roleList.filter(role => !this.roleIds.includes(role.roleId!));
+        this.roleList = this.roleList.concat(this.userRole);
+      },
+      error: (error) => {
+        this._snackBar.open(error.error.errorMessage, "OK", {
           duration: 3000,
           verticalPosition: 'top'
         })
+      }
+    })
+
+  }
+
+  selectRole(){
+    this.roleName = this.roles.value!.map((role: { roleName: string; }) => role.roleName);
+    this.haveUserRole = this.roleName.includes("USER");
+  }
+
+
+  onSubmit(){
+    this.userService.updateRoles(this.userId,this.roles.value!).subscribe({
+      next: (data) => {
+        this._snackBar.open(data.message, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+        this.router.navigate(['/admin/profile'])
       },
       error: (error) => {
         this._snackBar.open(error.error.errorMessage, "OK", {
@@ -66,6 +92,7 @@ export class RolesComponent implements OnInit {
         })
       }
     });
+    
   }  
 
  

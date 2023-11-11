@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       if(this.authService.isAdminUser(data.body.user)) {
         this.router.navigate(['/admin']);
       } else {
-        this.router.navigate(['/user-dashboard']);
+        this.router.navigate(['/']);
       }
     },
       error: (error) => {

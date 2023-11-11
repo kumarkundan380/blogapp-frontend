@@ -11,10 +11,10 @@ import { AuthService } from 'src/app/services/auth.service';
 export class HeaderComponent implements OnInit,OnDestroy {
 
   isLoggedIn!:boolean;
+  isAdmin!: boolean;
   showLoginButton!:boolean;
   showSignupButton!:boolean;
   userName!:string;
-  //backgroundImage:string = '../../../assets/profile.png';
   profileImage!:string;
   logInSubscription!:Subscription
   profileImageSubscription!:Subscription;
@@ -53,6 +53,15 @@ export class HeaderComponent implements OnInit,OnDestroy {
     }
     if(this.authService.getUserInfo()?.userImage) {
       this.profileImage = this.authService.getUserInfo().userImage!;
+    }
+    this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
+  }
+
+  goToHomePage() {
+    if(this.isAdmin) {
+      this.router.navigate([`/admin`])
+    } else {
+      this.router.navigate(['/']);
     }
   }
 

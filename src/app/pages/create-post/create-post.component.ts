@@ -23,6 +23,7 @@ export class CreatePostComponent implements OnInit {
   selectedFile: File | null = null;
   imageSrc: string | ArrayBuffer | null | undefined = null;
   categories!: Category[];
+  isAdmin!: boolean;
   public Editor = ClassicEditor;
 
   constructor(private authService : AuthService, 
@@ -43,6 +44,7 @@ export class CreatePostComponent implements OnInit {
 	    postContent: new FormControl('',Validators.required),
 	    categoryId: new FormControl('', Validators.required)
     });
+    this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
   }
 
   getAllCategories(){
@@ -92,7 +94,7 @@ export class CreatePostComponent implements OnInit {
           verticalPosition: 'top'
         })
         this.createPostForm.reset();
-        this.router.navigate([`admin/posts`])
+        this.goToHomePage();
       },
       error: (error) => {
         this._snackBar.open(error.error.errorMessage, "OK", {
@@ -101,6 +103,15 @@ export class CreatePostComponent implements OnInit {
         })
       }
     });
+  }
+
+  goToHomePage() {
+    console.log(this.isAdmin)
+    if(this.isAdmin) {
+      this.router.navigate([`/admin`])
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
 

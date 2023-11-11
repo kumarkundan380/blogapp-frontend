@@ -1,27 +1,29 @@
 <div class="container">
-    <div class="d-flex justify-content-center center">
-        <form [formGroup] = "updateRole" (ngSubmit) = onSubmit()>
+    <h1 class="text-center">Update Roles</h1>
+    <div class="d-flex justify-content-center center mb-5">
+        <form (ngSubmit) = onSubmit()>
             <mat-form-field>
                 <mat-label>Roles</mat-label>
-                <mat-select [formControl]="roleList" multiple>
+                <mat-select [formControl]="roles" (selectionChange)="selectRole()" multiple >
                   <mat-select-trigger>
-                    {{roleList.value?.[0]?.['roleName'] || ''}}
-                    <span *ngIf="(roleList.value?.length || 0) > 1" class="dropdown-section">
-                      (+{{(roleList.value?.length || 0) - 1}} {{roleList.value?.length === 2 ? 'other' : 'others'}})
+                    {{roles.value?.[0]?.['roleName'] || ''}}
+                    <span *ngIf="(roles.value?.length || 0) > 1" class="dropdown-section">
+                      (+{{(roles.value?.length || 0) - 1}} {{roles.value?.length === 2 ? 'other' : 'others'}})
                     </span>
                   </mat-select-trigger>
-                  <mat-option *ngFor="let role of roles" [value]="role">{{role.roleName}}</mat-option>
+                  
+                  <mat-option *ngFor="let role of roleList" [value]="role">{{role.roleName}}</mat-option>
                 </mat-select>
             </mat-form-field>
-            <div>
-                <button type="submit" mat-raised-button color="primary" [disabled]="!updateRole.valid">Submit</button>
+            <mat-error *ngIf ="!haveUserRole">User Role is required</mat-error>
+            <div class="mt-5">
+                <button type="submit" mat-raised-button color="primary" [disabled]="!haveUserRole" >Submit</button>
             </div>
         </form>
         
     </div>
     
 </div>
-
 
 <!-- <mat-form-field>
   <mat-label>Toppings</mat-label>
