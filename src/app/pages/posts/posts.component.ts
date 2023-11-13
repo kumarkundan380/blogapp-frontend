@@ -64,7 +64,12 @@ export class PostsComponent implements OnInit{
   }
 
   createPost(): void {
-    this.router.navigate([`/create-post`]);
+    if(this.authService.isLoggedIn()){
+      this.router.navigate([`/create-post`]);
+    } else {
+      this.router.navigate([`/login`]);
+    }
+    
   }
 
   updatePost(post: Post) {

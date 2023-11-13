@@ -17,8 +17,8 @@
         <div class="card-footer">
             <mat-icon class="ms-1">thumb_up</mat-icon>0
             <mat-icon class="ms-3">thumb_down</mat-icon>0
-            <button *ngIf="isSameUser(post?.user?.userId!)" mat-raised-button color="primary" class="ms-5" (click)="editPost(post)" >Update</button>
-            <button *ngIf="isSameUser(post?.user?.userId!) && (post.status !== 'DELETED')" mat-raised-button color="warn" class="ms-2" (click)="deletePost(post)">Delete</button>
+            <button *ngIf="isAdmin || isSameUser(post?.user?.userId!)" mat-raised-button color="primary" class="ms-5" (click)="editPost(post)" >Update</button>
+            <button *ngIf="isAdmin || isSameUser(post?.user?.userId!) && (post.status !== 'DELETED')" mat-raised-button color="warn" class="ms-2" (click)="deletePost(post)">Delete</button>
         </div>
     </div>
 
