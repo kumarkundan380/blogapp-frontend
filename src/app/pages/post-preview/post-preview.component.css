@@ -20,4 +20,7 @@
     color: blue;
     text-decoration: underline !important;
     cursor: pointer;
-  }
+}
+.thumb-icon {
+    color: blue;
+}

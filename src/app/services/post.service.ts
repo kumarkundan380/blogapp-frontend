@@ -5,6 +5,7 @@ import { BlogappPageableResponse } from '../model/blogapp-pageable-response';
 import { BlogappResponse } from '../model/blogapp-response';
 import { Post } from '../model/post';
 import { Comment } from '../model/comment';
+import { Activity } from '../model/activity';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class PostService {
 
   private BASE_URL = "http://localhost:8080/api/v1/posts";
   private BASE_URL_COMMENT = "http://localhost:8080/api/v1/comments";
+  private BASE_URL_ACTIVITY = "http://localhost:8080/api/v1/activities";
 
   constructor(private httpClient : HttpClient) { }
 
@@ -61,5 +63,16 @@ export class PostService {
     return this.httpClient.put<BlogappResponse<Comment>>(`${this.BASE_URL_COMMENT}/${commentId}`, comment);
   }
 
+  createActivity(activity: Activity) : Observable<BlogappResponse<Activity>> {
+    return this.httpClient.post<BlogappResponse<Activity>>(`${this.BASE_URL_ACTIVITY}`,activity);
+  }
+
+  updateActivity(activity: Activity, activityId: number) : Observable<BlogappResponse<Activity>> {
+    return this.httpClient.put<BlogappResponse<Activity>>(`${this.BASE_URL_ACTIVITY}/${activityId}`,activity);
+  }
+
+  deleteActivity(activityId:number): Observable<BlogappResponse<void>> {
+    return this.httpClient.delete<BlogappResponse<void>>(`${this.BASE_URL_ACTIVITY}/${activityId}`);
+  }
 
 }

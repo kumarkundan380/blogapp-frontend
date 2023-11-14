@@ -1,3 +1,4 @@
+import { Activity } from "./activity";
 import { Post } from "./post";
 import { User } from "./user";
 
@@ -9,6 +10,7 @@ export interface Comment {
     user: User;
     postId?: number;
     userId?: number;
+    activities?:Activity[];
     createdAt?: string;
     updatedAt?: string;
 }

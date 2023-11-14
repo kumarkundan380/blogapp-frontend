@@ -162,7 +162,7 @@ export class UpdatePostComponent {
 
   goToHomePage() {
     if(this.isAdmin) {
-      this.router.navigate([`/admin`])
+      this.router.navigate([`/admin/posts`])
     } else {
       this.router.navigate(['/']);
     }

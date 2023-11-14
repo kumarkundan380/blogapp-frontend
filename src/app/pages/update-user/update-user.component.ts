@@ -160,7 +160,7 @@ export class UpdateUserComponent implements OnInit {
         })
         this.updateUserForm.reset();
         if(this.isAdmin){
-          this.router.navigate(['/admin']);
+          this.router.navigate(['/admin/profile']);
         } else{
           this.router.navigate(['/profile']);
         }

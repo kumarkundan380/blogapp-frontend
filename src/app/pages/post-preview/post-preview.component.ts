@@ -8,13 +8,14 @@ import { AuthService } from 'src/app/services/auth.service';
 import { PostService } from 'src/app/services/post.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DialogService } from 'src/app/services/dialog.service';
+import { Activity } from 'src/app/model/activity';
 
 @Component({
   selector: 'app-post-preview',
   templateUrl: './post-preview.component.html',
   styleUrls: ['./post-preview.component.css']
 })
-export class PostPreviewComponent implements OnInit{
+export class PostPreviewComponent implements OnInit {
 
   isAdmin!: boolean;
   post!: Post;
@@ -31,6 +32,14 @@ export class PostPreviewComponent implements OnInit{
   updateComment!: Comment;
   commentId!: number;
   isLoggedIn!: boolean;
+  activity!: Activity;
+  likeCount: number = 0;
+  disLikeCount: number = 0;
+  likedUserId!: number[];
+  disLikedUserId!: number[];
+  activityId!: number;
+  postLiked!: boolean;
+  postDisLiked!: boolean;
 
   constructor(private authService : AuthService, 
     private activateRoute: ActivatedRoute,
@@ -57,7 +66,8 @@ export class PostPreviewComponent implements OnInit{
   getPost(postId:number){
     this.postService.getPost(postId).subscribe({
       next: (data) => {
-        this.post = data.body; 
+        this.post = data.body;
+        this.getLikeAndDisLikeCount(data.body); 
       },
       error:(error) => {
         this._snackBar.open(error.error?.errorMessage, "OK", {
@@ -66,6 +76,158 @@ export class PostPreviewComponent implements OnInit{
         })
       }
     })
+  }
+
+  getLikeAndDisLikeCount(post:Post){
+    if(post.activities!?.length>0){
+      this.likeCount = post.activities!.filter(activity => activity.activityType==="LIKE").length;
+      this.likedUserId = post.activities!.filter(activity => activity.entityType==="Like").map(activity => activity.user.userId!);
+      this.disLikeCount = post.activities!.filter(activity => activity.activityType==="DISLIKE").length;
+      this.disLikedUserId = post.activities!.filter(activity => activity.entityType==="DISLIKE").map(activity => activity.user.userId!);
+    } else {
+      this.likeCount = 0;
+      this.disLikeCount = 0;
+    }
+    this.postLiked = this.isPostLiked();
+    this.postDisLiked = this.isPostDisLiked();
+  }
+
+  isPostLiked(){
+    return (this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo()?.userId)?.activityType == "LIKE");
+  }
+
+  isPostDisLiked(){
+    return (this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo()?.userId)?.activityType == "DISLIKE");
+  }
+
+  likePost(activityType:string, entityType: string, postId:number){
+    if(!this.authService.isLoggedIn()){
+      this.router.navigate(['/login']);
+    } else {
+      if(this.isPostLiked()){
+        this.postDisLiked = false;
+        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
+        this.deleteActivity(this.activityId);
+      } else if(this.isPostDisLiked()){
+        this.postLiked = false;
+        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
+        this.activity = {
+          activityType: activityType,
+          entityType: entityType,
+          user: this.authService.getUserInfo(),
+          userId: this.authService.getUserInfo().userId!,
+          postId: postId,
+        }
+        this.updateActivity(this.activity,this.activityId);
+      } else{
+        this.activity = {
+          activityType: activityType,
+          entityType: entityType,
+          user: this.authService.getUserInfo(),
+          userId: this.authService.getUserInfo().userId!,
+          postId: postId,
+        }
+        this.createActivity(this.activity);
+      }
+    }
+    
+  }
+
+  disLikePost(activityType:string,entityType: string, postId:number){
+    if(!this.authService.isLoggedIn()){
+      this.router.navigate(['/login']);
+    } else {
+      if(this.isPostDisLiked()){
+        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
+        this.deleteActivity(this.activityId);
+      } else if(this.isPostLiked()){
+        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
+        this.activity = {
+          activityType: activityType,
+          entityType: entityType,
+          user: this.authService.getUserInfo(),
+          userId: this.authService.getUserInfo().userId!,
+          postId: postId,
+        }
+        this.updateActivity(this.activity,this.activityId);
+      } else {
+        this.activity = {
+          activityType: activityType,
+          entityType: entityType,
+          user: this.authService.getUserInfo(),
+          userId: this.authService.getUserInfo().userId!,
+          postId: postId,
+        }
+        this.createActivity(this.activity);
+      }
+    }
+    
+    
+  }
+
+  isPostAlreadyLiked(){
+    return this.likedUserId?.includes(this.authService.getUserInfo().userId!);
+  }
+
+  isPostAlreadyDisLiked(){
+    return this.disLikedUserId?.includes(this.authService.getUserInfo().userId!);
+  }
+
+  createActivity(activity: Activity) {
+    this.postService.createActivity(activity).subscribe({
+      next: (data) => {
+          this._snackBar.open(data.message, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+        this.getPost(activity.postId!);
+      },
+      error: (error) => {
+        this._snackBar.open(error.error.errorMessage, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+      }
+    });
+
+  }
+
+  updateActivity(activity: Activity, activityId: number) {
+    this.postService.updateActivity(activity, activityId).subscribe({
+      next: (data) => {
+          this._snackBar.open(data.message, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+        this.getPost(activity.postId!);
+      },
+      error: (error) => {
+        this._snackBar.open(error.error.errorMessage, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+      }
+    });
+
+  }
+
+  deleteActivity(activityId: number) {
+    this.postService.deleteActivity(activityId).subscribe({
+      next: (data) => {
+          this._snackBar.open(data.message, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+        this.getPost(this.postId!);
+      },
+      error: (error) => {
+        this._snackBar.open(error.error.errorMessage, "OK", {
+          duration: 3000,
+          verticalPosition: 'top'
+        })
+      }
+    });
+
   }
 
   goToHomePage() {
