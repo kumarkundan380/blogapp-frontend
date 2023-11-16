@@ -11,10 +11,10 @@ export class DialogService {
 
   openConfirmDialog(message:string){
     return this.matDialog.open(ConfirmDialogComponent, {
-      width:'390px',
+      width:'30%',
       panelClass:'confirm-dialog-container',
       disableClose:true,
-      position: { top: "20px" },
+      position: { top: "1rem" },
       data :{
         message : message
       }

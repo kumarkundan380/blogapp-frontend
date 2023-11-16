@@ -45,6 +45,10 @@
                         </form>
                     </ng-template>
                 </div>
+                <div class="card-footer">
+                    <mat-icon class="ms-1" [ngClass]="{'thumb-icon' : comment.isCommentLiked!}" (click)="likeComment('LIKE','COMMENT',comment)">thumb_up</mat-icon>{{getCommentLikedCount(comment)}}
+                    <mat-icon class="ms-3" [ngClass]="{'thumb-icon' : comment.isCommentDisliked!}" (click)="disLikeComment('DISLIKE','COMMENT',comment)">thumb_down</mat-icon>{{getCommentDisLikedCount(comment)}}        
+                </div>
             </div>
         </div>
     </ng-template>

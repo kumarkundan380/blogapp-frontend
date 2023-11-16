@@ -13,4 +13,8 @@ export interface Comment {
     activities?:Activity[];
     createdAt?: string;
     updatedAt?: string;
+    isCommentLiked?:boolean;
+    isCommentDisliked?:boolean;
+    commentLikedCount?: number;
+    commentDisLikedCount?: number;
 }

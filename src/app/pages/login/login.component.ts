@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { LoginRequest } from 'src/app/model/login-request';
 import { AuthService } from 'src/app/services/auth.service';
+import { ForgotPasswordComponent } from 'src/app/components/forgot-password/forgot-password.component';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +22,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(private authService : AuthService, 
     private router: Router,
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar){
+    private _snackBar: MatSnackBar,
+    private matDialog: MatDialog){
     
   }
 
@@ -78,6 +81,23 @@ export class LoginComponent implements OnInit, OnDestroy {
 	    password: new FormControl('', Validators.required),
     });
   }
+
+  frogotPassword() {
+    this.matDialog.open(ForgotPasswordComponent, {
+      width:'50%',
+      height:'45%',
+      enterAnimationDuration: '1000ms',
+      exitAnimationDuration: '1000ms',
+      disableClose : true,
+      autoFocus : true,
+      data: {
+        title: 'Forgot Password'
+      }
+
+    })
+  }
+
+  
 
   ngOnDestroy(): void {
     this.authService.showLoginButtonSubject.next(true);

@@ -4,39 +4,39 @@
         <div class="col-md-4">
             <mat-card class="user-card">
                 <mat-card-header>
-                  <mat-card-title><a [routerLink]="['/admin/user-list']">No of User:{{adminInfo.numberOfUser}}</a></mat-card-title>
+                  <mat-card-title><a [routerLink]="['/admin/user-list']">No of User:{{adminInfo && adminInfo.numberOfUser}}</a></mat-card-title>
                   <mat-card-subtitle>User Information</mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>No Of Active User: {{adminInfo.numberOfActiveUser}}</p>
-                    <p>No Of Pending User: {{adminInfo.numberOfPendingUser}}</p>
-                    <p>No Of Deleted User: {{adminInfo.numberOfDeletedUser}}</p>
+                    <p>No Of Active User: {{adminInfo && adminInfo.numberOfActiveUser}}</p>
+                    <p>No Of Pending User: {{adminInfo && adminInfo.numberOfPendingUser}}</p>
+                    <p>No Of Deleted User: {{adminInfo && adminInfo.numberOfDeletedUser}}</p>
                 </mat-card-content>
             </mat-card>
         </div>
         <div class="col-md-4">
             <mat-card class="user-card">
                 <mat-card-header>
-                  <mat-card-title> <a [routerLink]="['/admin/categories']">No of Category:{{adminInfo.numberOfCategory}}</a></mat-card-title>
+                  <mat-card-title> <a [routerLink]="['/admin/categories']">No of Category:{{adminInfo && adminInfo.numberOfCategory}}</a></mat-card-title>
                   <mat-card-subtitle>Category Information</mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>No Of Active Category: {{adminInfo.numberOfCategory}}</p>
-                    <p>No Of Pending Category: {{adminInfo.numberOfPendingCategory == null ? 0 : adminInfo.numberOfPendingCategory}}</p>
-                    <p>No Of Deleted Category: {{adminInfo.numberOfDeletedCategory == null ? 0 : adminInfo.numberOfDeletedCategory}}</p>  
+                    <p>No Of Active Category: {{adminInfo && adminInfo.numberOfCategory}}</p>
+                    <p>No Of Pending Category: {{adminInfo && adminInfo.numberOfPendingCategory == null ? 0 : adminInfo && adminInfo.numberOfPendingCategory}}</p>
+                    <p>No Of Deleted Category: {{adminInfo && adminInfo.numberOfDeletedCategory == null ? 0 : adminInfo && adminInfo.numberOfDeletedCategory}}</p>  
                 </mat-card-content>
             </mat-card>
         </div>
         <div class="col-md-4">
             <mat-card class="user-card">
                 <mat-card-header>
-                  <mat-card-title> <a [routerLink]="['/admin/posts']">No of Post:{{adminInfo.numberOfPost}}</a></mat-card-title>
+                  <mat-card-title> <a [routerLink]="['/admin/posts']">No of Post:{{adminInfo && adminInfo.numberOfPost}}</a></mat-card-title>
                   <mat-card-subtitle>Post Information</mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>No Of Active Post: {{adminInfo.numberOfActivePost}}</p>
-                    <p>No Of Pending Post: {{adminInfo.numberOfPendingPost}}</p>
-                    <p>No Of Deleted Post: {{adminInfo.numberOfDeletedPost}}</p>  
+                    <p>No Of Active Post: {{adminInfo && adminInfo.numberOfActivePost}}</p>
+                    <p>No Of Pending Post: {{adminInfo && adminInfo.numberOfPendingPost}}</p>
+                    <p>No Of Deleted Post: {{adminInfo && adminInfo.numberOfDeletedPost}}</p>  
                 </mat-card-content>
             </mat-card>
         </div>

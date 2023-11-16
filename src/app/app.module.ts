@@ -35,6 +35,7 @@ import { CreatePostComponent } from './pages/create-post/create-post.component';
 import { UpdatePostComponent } from './pages/update-post/update-post.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { PostPreviewComponent } from './pages/post-preview/post-preview.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import { PostPreviewComponent } from './pages/post-preview/post-preview.componen
     PostsComponent,
     CreatePostComponent,
     UpdatePostComponent,
-    PostPreviewComponent
+    PostPreviewComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     BrowserModule,
