@@ -58,7 +58,7 @@ export class HeaderComponent implements OnInit,OnDestroy {
   }
 
   goToHomePage() {
-    if(this.isAdmin) {
+    if(this.authService.isLoggedIn() && this.isAdmin) {
       this.router.navigate([`/admin`])
     } else {
       this.router.navigate(['/']);
