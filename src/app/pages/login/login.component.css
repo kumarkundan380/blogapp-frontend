@@ -1,3 +1,7 @@
+.image-container {
+    height: 200px;
+    width: 200px;
+ }
 .link {
     color: blue;
     text-decoration: underline !important;

@@ -23,12 +23,6 @@ export class HeaderComponent implements OnInit,OnDestroy {
   
 
   ngOnInit(): void {
-    // this.logInSubscription = this.authService.logInStatusSubject.asObservable().subscribe(data => {
-    //   this.isLoggedIn = data;
-    //   if(this.isLoggedIn){
-    //     this.userName = this.authService.getUserInfo().userName;
-    //   }
-    // });
     this.authService.showLoginButtonSubject.subscribe(data => {
       this.showLoginButton=data
     })
@@ -42,9 +36,6 @@ export class HeaderComponent implements OnInit,OnDestroy {
       }
     });
     this.isLoggedIn = this.authService.isLoggedIn();
-    // this.profileImageSubscription = this.authService.profileImageSubject.asObservable().subscribe(data => {
-    //   this.profileImage = data;
-    // })
     this.authService.profileImageSubject.subscribe(data => {
       this.profileImage = data;
     })

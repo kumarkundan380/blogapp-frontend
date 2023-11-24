@@ -21,6 +21,9 @@ import { CreatePostComponent } from './pages/create-post/create-post.component';
 import { UpdatePostComponent } from './pages/update-post/update-post.component';
 import { PostPreviewComponent } from './pages/post-preview/post-preview.component';
 import { AdminHomeComponent } from './pages/admin-home/admin-home.component';
+import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 
 
 const routes: Routes = [
@@ -39,6 +42,18 @@ const routes: Routes = [
   {
     path: 'posts/:postId',
     component: PostPreviewComponent
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordComponent
+  },
+  {
+    path: 'forgot-password/:token',
+    component: ChangePasswordComponent
+  },
+  {
+    path: 'verify-email/:token',
+    component: VerifyEmailComponent
   },
   {
     path:'profile',

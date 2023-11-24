@@ -1,8 +1,8 @@
 <div class="container">
-    <div class="row mt-5">
+    <div class="row">
         <div class="col-md-6 offset-md-3">
-            <div class="d-flex justify-content-center">
-                <img src="../../../assets/logo.jpg" alt="" class="rounded-circle">
+            <div class="d-flex justify-content-center mt-3">
+                <img src="../../../assets/logo.png" alt="" class="rounded-circle image-container">
             </div>
             <h2 class="text-center">Login Here</h2>
             <form [formGroup] = "logInForm" (ngSubmit) = onSubmit()>
@@ -16,7 +16,10 @@
                 <!-- Password Field -->
                 <mat-form-field class="w-100" appearance="outline">
                     <mat-label>Password</mat-label>
-                    <input type="password" matInput placeholder="Enter Here" formControlName="password">
+                    <input matInput [type]="hide ? 'password' : 'text'" placeholder="Enter Here" formControlName="password">
+                    <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
                     <mat-error *ngIf ="logInForm.get('password')?.hasError('required') && logInForm.get('password')?.touched">Password is required</mat-error>
                 </mat-form-field>
 

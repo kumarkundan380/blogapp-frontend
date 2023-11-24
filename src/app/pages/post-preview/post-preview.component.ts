@@ -235,7 +235,6 @@ export class PostPreviewComponent implements OnInit {
         comment.isCommentLiked = false;
         comment.isCommentDisliked = true;
         this.activityId = comment.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        console.log(this.activityId);
         this.activity = {
           activityType: activityType,
           entityType: entityType,

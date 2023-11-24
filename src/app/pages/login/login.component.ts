@@ -1,11 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { LoginRequest } from 'src/app/model/login-request';
 import { AuthService } from 'src/app/services/auth.service';
-import { ForgotPasswordComponent } from 'src/app/components/forgot-password/forgot-password.component';
 
 @Component({
   selector: 'app-login',
@@ -18,12 +16,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginRequest!: LoginRequest;
   isLoggedIn!: boolean;
   profileImage!: string;
+  hide=true;
 
   constructor(private authService : AuthService, 
     private router: Router,
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar,
-    private matDialog: MatDialog){
+    private _snackBar: MatSnackBar){
     
   }
 
@@ -52,7 +50,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.authService.logInStatusSubject.next(true);
         if(data.body.user.userImage){
           this.authService.profileImageSubject.next(data.body.user.userImage);
-          //this.profileImage = data.body.user.userImage;
         } 
         this._snackBar.open(data.message, "OK", {
         duration: 3000,
@@ -83,18 +80,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   frogotPassword() {
-    this.matDialog.open(ForgotPasswordComponent, {
-      width:'50%',
-      height:'45%',
-      enterAnimationDuration: '1000ms',
-      exitAnimationDuration: '1000ms',
-      disableClose : true,
-      autoFocus : true,
-      data: {
-        title: 'Forgot Password'
-      }
-
-    })
+    this.router.navigate(['/forgot-password'])
   }
 
   

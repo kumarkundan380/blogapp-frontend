@@ -19,6 +19,7 @@ export class SignupComponent implements OnInit,OnDestroy {
   selectedFile: File | null = null;
   file!:Blob;
   imageSrc: string | ArrayBuffer | null | undefined = null;
+  hide=true;
 
   constructor(private userService : UserService,
     private authService: AuthService, 
@@ -31,7 +32,7 @@ export class SignupComponent implements OnInit,OnDestroy {
   ngOnInit(): void {
     this.authService.showSignupButtonSubject.next(false);
     this.authService.showLoginButtonSubject.next(true);
-    this.imageSrc = "../../../assets/logo.jpg";
+    this.imageSrc = "../../../assets/profile.png";
     this.signUpForm = this.formBuilder.group({
       userName: new FormControl('',[Validators.required, Validators.email]),
 	    password: new FormControl('', [Validators.required, Validators.minLength(4), Validators.maxLength(10)]),
