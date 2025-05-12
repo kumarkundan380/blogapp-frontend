@@ -17,4 +17,6 @@ export interface Comment {
     isCommentDisliked?:boolean;
     commentLikedCount?: number;
     commentDisLikedCount?: number;
+    version?: number;
+    isEdited: boolean;
 }

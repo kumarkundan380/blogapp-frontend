@@ -1,60 +1,117 @@
-<div class="container">
-    <table *ngIf="users!==undefined && users.content.length > 0" class="table table-hover table-borderless">
-        <thead>
-            <tr>
-                <th>S. No.</th>  
-                <th>User Id</th>
-                <th>Username</th>
-                <th>Name</th>
-                <th>Phone Number</th>
-                <th>Gender</th>
-                <th>Is Verifyed</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let user of users.content;index as i">
-                <td> {{(users.pageSize*users.pageNumber)+i+1}} </td>
-                <td> {{user.userId}} </td>
-                <td> {{user.userName}} </td>
-                <td> {{getFullName(user)}} </td> 
-                <td> {{user.phoneNumber}} </td>
-                <td> {{user.gender}} </td>
-                <td>
-                    <span  class="badge" [ngClass] = "user.isVerified ? 'bg-success' : 'bg-danger'">{{user.isVerified?'YES':'NO'}} </span>      
-                </td>
-                <td> 
-                    <span class="badge" [ngClass] = "user.userStatus=='ACTIVE'? 'bg-success' : 'bg-danger'">{{user.userStatus}} </span>
-                </td>
-                <td>
-                    <button mat-icon-button color="accent" (click)="updateUser(user)">
-                        <mat-icon>open_in_new</mat-icon>
-                    </button>
-                    <button mat-icon-button [disabled]="user.userStatus=='DELETED'" color="warn" (click)="deleteUser(user)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </td> 
-            </tr>
-        </tbody>
-    </table>
-    <div class="d-flex justify-content-center">
-        <nav *ngIf="users!==undefined && users.content.length > 0" aria-label="Page navigation example">
-            <ul class="pagination">
-                <li class="page-item" [ngClass]="users.isFirst?'disabled':'' ">
-                    <a class="page-link" (click)="onPageChange(users.pageNumber-1)" aria-label="Previous">
-                        <span aria-hidden="true">&laquo; Previous</span>
-                    </a>
-                </li>
-                <li *ngFor="let page of [].constructor(users.totalPages); index as i" class="page-item">
-                    <a class="page-link" (click)="onPageChange(i)">{{i+1}}</a>
-                </li>
-                <li class="page-item" [ngClass]="users.isLast?'disabled':'' ">
-                    <a class="page-link" (click)="onPageChange(users.pageNumber+1)" aria-label="Next">
-                        <span aria-hidden="true">Next &raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<div class="user-list-container">
+    <!-- Search Form -->
+    <form [formGroup]="searchUserForm" (ngSubmit)="onSubmit()" class="search-form">
+        <div class="form-row">
+     
+            <mat-form-field appearance="outline">
+                <mat-label>Search by</mat-label>
+                <mat-select formControlName="searchKey">
+                    <mat-option *ngFor="let option of searchList" [value]="option.value">{{ option.label }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Text Input (Default) -->
+            <mat-form-field *ngIf="selectedSearchType === 'text'" appearance="outline" class="search-input">
+                <input matInput placeholder="Search..." formControlName="searchValue">
+            </mat-form-field>
+  
+            <!-- Dropdown Input -->
+            <mat-form-field *ngIf="selectedSearchType === 'dropdown'" appearance="outline" class="search-input">
+                <mat-label>Select value</mat-label>
+                <mat-select formControlName="searchValue">
+                    <mat-option *ngFor="let opt of searchOptions" [value]="opt">{{ opt }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <button mat-flat-button color="primary" type="submit"
+                [disabled]="!searchUserForm.get('searchKey')?.value || !searchUserForm.get('searchValue')?.value?.trim()">
+                <mat-icon>search</mat-icon> Search
+            </button>
+            <button mat-icon-button type="button" aria-label="Reset" (click)="onReset()" matTooltip="Reset">
+                <mat-icon>refresh</mat-icon>
+            </button> 
+        </div>
+    </form>
+  
+    <!-- User Table -->
+    <div class="table-responsive">
+        <table *ngIf="users?.content?.length" class="table table-hover table-borderless mat-elevation-z2">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Email Verified</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users.content; let i = index; trackBy: trackByUserId">
+                    <td>{{ user.userId }}</td>
+                    <td>{{ user.userName }}</td>
+                    <td>{{ getFullName(user) }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="{'bg-success': user.emailVerified, 'bg-danger': !user.emailVerified}">
+                            {{ user.emailVerified ? 'YES' : 'NO' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span 
+                            class="badge"
+                            [ngClass]="{
+                                'bg-success': user.status === 'ACTIVE',
+                                'bg-danger': user.status === 'DELETED',
+                                'bg-warning text-dark': user.status === 'PENDING'
+                            }">
+                            {{ user.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button mat-icon-button color="primary" (click)="viewUser(user)" matTooltip="View" matTooltipPosition="above">
+                                <mat-icon>visibility</mat-icon>
+                            </button>
+                            <button mat-icon-button color="accent" (click)="updateUser(user)" matTooltip="Edit" matTooltipPosition="above">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" [disabled]="user.status === 'DELETED'" (click)="deleteUser(user)" matTooltip="Delete" matTooltipPosition="above">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>    
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+  
+   <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="users?.content?.length">
+        <button mat-button [disabled]="users.isFirst" (click)="onPageChange(users.pageNumber - 1)">
+            <mat-icon>chevron_left</mat-icon> Previous
+        </button>
+  
+        <ng-container *ngFor="let page of getPageNumbers(); let i = index">
+            <button 
+                mat-stroked-button 
+                color="primary" 
+                [disabled]="i === users.pageNumber"
+                [ngClass]="{ 'active-page': i === users.pageNumber }"
+                (click)="onPageChange(i)">
+                {{ i + 1 }}
+            </button>
+        </ng-container>
+  
+        <button mat-button [disabled]="users.isLast" (click)="onPageChange(users.pageNumber + 1)">
+            Next <mat-icon>chevron_right</mat-icon>
+        </button>
+    </div>
+
+      <!-- No Post Message -->
+    <div *ngIf="users?.content?.length === 0" class="text-center">
+        <h4>No User Found.</h4>
+    </div>
+   
 </div>

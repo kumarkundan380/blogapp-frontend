@@ -1,12 +1,83 @@
-.example-spacer {
-    flex: 1 1 auto;
+/* Sticky Header */
+.sticky-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200; /* Ensure the header stays on top */
+  width: 100%;
+  background-color: #222; /* Dark background */
+  color: white; /* Text color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for a modern look */
+  padding: 10px 20px; /* Add padding to give space */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.3s ease; /* Smooth background color transition */
 }
+  
+/* Profile image circle */
 .profile {
-    margin-left: 10px;
-    width: 50px;
-    height: 50px;
-    border: 2px solid #ff4081;
-    border-radius: 50%;
-    /* background-image: url(../../../assets/profile.png); */
-    background-size: cover;
+  margin-left: 1rem;
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid #ff4081;
+  border-radius: 50%;
+  background-size: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease; /* Smooth transform transition */
 }
+  
+.profile:hover {
+  transform: scale(1.1); /* Hover effect to enlarge the profile image */
+}
+  
+/* Header title */
+.header-title {
+  font-size: 1.5rem; /* Make the title bigger */
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #ff4081; /* Accent color */
+}
+  
+/* Spacing between elements */
+.example-spacer {
+  flex: 1 1 auto;
+}
+  
+/* Buttons styling */
+mat-flat-button {
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
+  
+mat-flat-button:hover {
+  background-color: #ff4081;
+}
+
+.app-title {
+  cursor: pointer;
+}
+  
+/* Responsive adjustments for small screens */
+@media (max-width: 600px) {
+  .profile {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-left: 0.5rem;
+  }
+  
+  .header-title {
+    font-size: 1.2rem; /* Adjust header title size for small screens */
+  }
+  
+  mat-flat-button {
+    font-size: 0.9rem; /* Smaller font for buttons */
+  }
+}
+
+
+  
+  

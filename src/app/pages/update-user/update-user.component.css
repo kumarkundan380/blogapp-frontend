@@ -1,4 +1,36 @@
-.image-container {
-    height: 200px;
-    width: 200px;
- }
+@import "../signup/signup.component.css";  /* If same folder level or adjust the path accordingly */
+
+.mat-icon-large {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Optional: override title icon */
+.mat-icon-large {
+  color: #3f51b5;
+}
+
+/* Target Material inputs that are readonly */
+mat-form-field input[readonly] {
+  background-color: #e9ecef; 
+  cursor: not-allowed;
+  pointer-events: none; 
+}
+  
+/* Optional: remove material focus ring when readonly */
+mat-form-field input[readonly]:focus {
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: transparent !important;
+}
+  
+/* Prevent hover effect on outline */
+mat-form-field.readonly .mat-form-field-outline {
+  pointer-events: none;
+}
+
+/* Additional styles if needed */

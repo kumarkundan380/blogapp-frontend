@@ -1,47 +1,80 @@
 <div class="container">
-    <mat-card>
-        <h1 class="text-center">Your Profile Details</h1>
-        <div class="container">
-            <mat-card-content>
-                <div class="container text-center">
-                    <img [src]="userImage" alt="Profile Image" class="profile-image">
-                    <h1 class="mt-2"> {{user!==undefined && getFullName(user)}} </h1>
-                    <h3>{{user!==undefined && user.about}}</h3>
-                </div>
-                <div class="col-md-6 offset-md-3">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col">
-                                <h3>Username</h3>
-                            </div>
-                            <div class="col">
-                                <h3> {{user!==undefined && user.userName}} </h3>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col">
-                                <h3>Phone Number</h3>
-                            </div>
-                            <div class="col">
-                                <h3>+91 {{user!==undefined && user.phoneNumber}}</h3>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <h3>Gender</h3>
-                            </div>
-                            <div class="col">
-                                <h3> {{user!==undefined && user.gender}} </h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <button type="submit" mat-raised-button color="primary"(click)="updateUser()" >Update</button>
-                    </div>
-                </div>
-            </mat-card-content>
+  <mat-card class="p-4 shadow">
+    <!-- Header -->
+    <div class="text-center mb-2">
+      <h2 class="mb-0">Your Profile</h2>
+      <p class="text-muted">Here's what we know about you</p>
+    </div>
+  
+    <mat-card-content>
+      <!-- Profile Picture & Name -->
+      <div class="text-center mb-4">
+        <img [src]="userImage" alt="Profile Image" class="profile-image mb-3">
+        <h3 class="fw-bold">{{ user !== undefined && getFullName(user) }}</h3>
+        <pre class="bio text-muted">{{ user !== undefined && user.about }}</pre>
+      </div>
+  
+      <!-- Profile Details Grid -->
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <mat-divider></mat-divider>
+          <div class="row pt-4 user-info-block" *ngIf="user">
+            <div class="col-6 font-weight-bold text-muted">Username:</div>
+            <div class="col-6">{{ user.userName }}</div>
+  
+            <div class="col-6 font-weight-bold text-muted">Email:</div>
+            <div class="col-6">{{ user.email }}</div>
+  
+            <div class="col-6 font-weight-bold text-muted">Phone Number:</div>
+            <div class="col-6">{{ user.phoneNumber }}</div>
+  
+            <div class="col-6 font-weight-bold text-muted">Gender:</div>
+            <div class="col-6">{{ user.gender }}</div>
+          </div>
+          <mat-divider class="my-3"></mat-divider>
+  
+          <!-- Update Button -->
+          <div class="text-center mt-3">
+            <button mat-raised-button color="primary" (click)="updateUser()">Update Profile</button>
+          </div>
         </div>
-    </mat-card>
-</div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+   <!-- Posts -->
+  <div class = "mt-5">
+    <h2 *ngIf="posts.content.length > 0" class=" text-center mb-4">All Posts</h2>
+    <div *ngFor="let post of posts.content" class="card mb-4 shadow-sm rounded">
+      <app-post-card [post]="post"></app-post-card>
+    </div>
 
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="posts?.content?.length">
+      <button mat-button [disabled]="posts.isFirst" (click)="onPageChange(posts.pageNumber - 1)">
+        <mat-icon>chevron_left</mat-icon> Previous
+      </button>
+  
+      <ng-container *ngFor="let page of getPageNumbers(); let i = index">
+        <button 
+          mat-stroked-button 
+          color="primary" 
+          [disabled]="i === posts.pageNumber"
+          [ngClass]="{ 'active-page': i === posts.pageNumber }"
+          (click)="onPageChange(i)">
+          {{ i + 1 }}
+        </button>
+      </ng-container>
+  
+      <button mat-button [disabled]="posts.isLast" (click)="onPageChange(posts.pageNumber + 1)">
+        Next <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+
+    <!-- No Post Message -->
+    <div *ngIf="posts.content.length === 0" class="text-center mt-5">
+      <h4>No Posts Found.</h4>
+    </div>
+  </div>  
+  
+</div>
+  

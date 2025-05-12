@@ -1,45 +1,87 @@
 <div class="container">
-    <h1 class="text-center">Welcome to Blog App</h1>  
+    <h1 class="text-center mb-4">Welcome to Blog App</h1>
+  
     <div class="row">
-        <div class="col-md-4">
-            <mat-card class="user-card">
-                <mat-card-header>
-                  <mat-card-title><a [routerLink]="['/admin/user-list']">No of User:{{adminInfo && adminInfo.numberOfUser}}</a></mat-card-title>
-                  <mat-card-subtitle>User Information</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>No Of Active User: {{adminInfo && adminInfo.numberOfActiveUser}}</p>
-                    <p>No Of Pending User: {{adminInfo && adminInfo.numberOfPendingUser}}</p>
-                    <p>No Of Deleted User: {{adminInfo && adminInfo.numberOfDeletedUser}}</p>
-                </mat-card-content>
-            </mat-card>
-        </div>
-        <div class="col-md-4">
-            <mat-card class="user-card">
-                <mat-card-header>
-                  <mat-card-title> <a [routerLink]="['/admin/categories']">No of Category:{{adminInfo && adminInfo.numberOfCategory}}</a></mat-card-title>
-                  <mat-card-subtitle>Category Information</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>No Of Active Category: {{adminInfo && adminInfo.numberOfCategory}}</p>
-                    <p>No Of Pending Category: {{adminInfo && adminInfo.numberOfPendingCategory == null ? 0 : adminInfo && adminInfo.numberOfPendingCategory}}</p>
-                    <p>No Of Deleted Category: {{adminInfo && adminInfo.numberOfDeletedCategory == null ? 0 : adminInfo && adminInfo.numberOfDeletedCategory}}</p>  
-                </mat-card-content>
-            </mat-card>
-        </div>
-        <div class="col-md-4">
-            <mat-card class="user-card">
-                <mat-card-header>
-                  <mat-card-title> <a [routerLink]="['/admin/posts']">No of Post:{{adminInfo && adminInfo.numberOfPost}}</a></mat-card-title>
-                  <mat-card-subtitle>Post Information</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>No Of Active Post: {{adminInfo && adminInfo.numberOfActivePost}}</p>
-                    <p>No Of Pending Post: {{adminInfo && adminInfo.numberOfPendingPost}}</p>
-                    <p>No Of Deleted Post: {{adminInfo && adminInfo.numberOfDeletedPost}}</p>  
-                </mat-card-content>
-            </mat-card>
-        </div>
+      <!-- User Stats Card -->
+      <div class="col-md-4 mb-3">
+        <mat-card class="user-card shadow-lg">
+          <mat-card-header>
+            <mat-card-title>
+              <a [routerLink]="['/admin/user-list']">
+                <mat-icon>person</mat-icon> No of Users: {{ adminInfo.numberOfUsers }}
+              </a>
+            </mat-card-title>
+            <mat-card-subtitle>User Information</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p><strong>No Of Active Users:</strong> {{ adminInfo.numberOfActiveUsers }}</p>
+            <p><strong>No Of Pending Users:</strong> {{ adminInfo.numberOfPendingUsers }}</p>
+            <p><strong>No Of Deleted Users:</strong> {{ adminInfo.numberOfDeletedUsers }}</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+  
+      <!-- Category Stats Card -->
+      <div class="col-md-4 mb-3">
+        <mat-card class="user-card shadow-lg">
+          <mat-card-header>
+            <mat-card-title>
+              <a [routerLink]="['/admin/categories']">
+                <mat-icon>category</mat-icon> No of Categories: {{ adminInfo.numberOfCategories }}
+              </a>
+            </mat-card-title>
+            <mat-card-subtitle>Category Information</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p><strong>No Of Active Categories:</strong> {{ adminInfo.numberOfCategories || 0 }}</p>
+            <p><strong>No Of Pending Categories:</strong> {{ adminInfo.numberOfPendingCategories || 0 }}</p>
+            <p><strong>No Of Deleted Categories:</strong> {{ adminInfo.numberOfDeletedCategories || 0 }}</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+  
+      <!-- Post Stats Card -->
+      <div class="col-md-4 mb-3">
+        <mat-card class="user-card shadow-lg">
+          <mat-card-header>
+            <mat-card-title>
+              <a [routerLink]="['/admin/posts']">
+                <mat-icon>article</mat-icon> No of Posts: {{ adminInfo.numberOfPosts }}
+              </a>
+            </mat-card-title>
+            <mat-card-subtitle>Post Information</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p><strong>No Of Active Posts:</strong> {{ adminInfo.numberOfActivePosts }}</p>
+            <p><strong>No Of Pending Posts:</strong> {{ adminInfo.numberOfPendingPosts }}</p>
+            <p><strong>No Of Deleted Posts:</strong> {{ adminInfo.numberOfDeletedPosts }}</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
-    
+  
+    <!-- Additional Cards (Optional) -->
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <mat-card class="extra-card shadow-lg">
+          <mat-card-header>
+            <mat-card-title><mat-icon>trending_up</mat-icon> System Overview</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Monitor the overall performance and health of the system. Get quick insights into system usage.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-md-6 mb-3">
+        <mat-card class="extra-card shadow-lg">
+          <mat-card-header>
+            <mat-card-title><mat-icon>settings</mat-icon> Settings</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Manage site settings, configuration, and customize your dashboard for better control.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
 </div>
+  

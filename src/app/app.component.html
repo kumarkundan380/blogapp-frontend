@@ -1,13 +1,18 @@
 <ngx-ui-loader
-    fgsColor="#ff4081"
-    text="Please wait..."
-    pbColor="#ff4081"
-    pbThickness:6>
-
+  fgsColor="#ff4081"
+  text="Please wait..."
+  pbColor="#ff4081"
+  [pbThickness]="6">
 </ngx-ui-loader>
 
-<div ngxUiLoaderBlurred blur:6>
-    <app-header></app-header>
+<div class="app-container" ngxUiLoaderBlurred [blur]="6">
+  <app-header></app-header>
+
+  <div class="content-wrapper">
     <router-outlet></router-outlet>
+  </div>
+
+  <app-footer></app-footer>
 </div>
+
 

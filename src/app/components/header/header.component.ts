@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
+import { ThemeService } from 'src/app/services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -10,75 +11,143 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class HeaderComponent implements OnInit,OnDestroy {
 
-  isLoggedIn!:boolean;
-  isAdmin!: boolean;
-  showLoginButton!:boolean;
-  showSignupButton!:boolean;
-  userName!:string;
-  profileImage!:string;
-  logInSubscription!:Subscription
-  profileImageSubscription!:Subscription;
-  
-  constructor(public authService : AuthService, private router : Router){}
-  
+  isLoggedIn = false;
+  isAdmin = false;
+  isSuperAdmin = false;
+  showLoginButton = true;
+  showSignupButton = true;
+  userName = '';
+  profileImage = '';
+  userId!: number;
 
+  private subscriptions: Subscription = new Subscription();
+
+  @Output() sidebarToggle = new EventEmitter<void>();
+  
+  constructor(public authService : AuthService, private router : Router, private themeService: ThemeService){}
+  
   ngOnInit(): void {
-    this.authService.showLoginButtonSubject.subscribe(data => {
-      this.showLoginButton=data
-    })
-    this.authService.showSignupButtonSubject.subscribe(data => {
-      this.showSignupButton = data;
-    })
-    this.authService.logInStatusSubject.subscribe(data => {
-      this.isLoggedIn = data;
-      if(this.isLoggedIn){
-        this.userName = this.authService.getUserInfo().userName;
-      }
-    });
-    this.isLoggedIn = this.authService.isLoggedIn();
-    this.authService.profileImageSubject.subscribe(data => {
-      this.profileImage = data;
-    })
-    if(this.isLoggedIn){
-      this.userName = this.authService.getUserInfo().userName;
-    }
-    if(this.authService.getUserInfo()?.userImage) {
-      this.profileImage = this.authService.getUserInfo().userImage!;
-    }
-    this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
+    this.initializeAuthSubscriptions();
+    this.loadInitialUserInfo();
   }
 
-  goToHomePage() {
-    if(this.authService.isLoggedIn() && this.isAdmin) {
-      this.router.navigate([`/admin`])
+  toggleSidebar(): void {
+    this.sidebarToggle.emit(); // Notify parent to toggle sidebar
+    this.goToHomePage();
+  }
+
+  private initializeAuthSubscriptions(): void {
+    this.subscriptions.add(
+      this.authService.showLoginButtonSubject.subscribe(show => {
+        this.showLoginButton = show;
+      })
+    );
+
+    this.subscriptions.add(
+      this.authService.showSignupButtonSubject.subscribe(show => {
+        this.showSignupButton = show;
+      })
+    );
+
+    this.subscriptions.add(
+      this.authService.logInStatusSubject.subscribe(status => {
+        this.isLoggedIn = status;
+        if (this.isLoggedIn) {
+          const userInfo = this.authService.getUserInfo();
+          if (userInfo) {
+            this.userName = userInfo.userName;
+            this.isSuperAdmin = this.authService.isSuperAdminUser(userInfo);
+            this.isAdmin = this.authService.isAdminUser(userInfo);
+          }
+        } else {
+          this.resetUserInfo();
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.authService.profileImageSubject.subscribe(image => {
+        this.profileImage = image;
+      })
+    );
+  }
+
+  private loadInitialUserInfo(): void {
+    this.isLoggedIn = this.authService.isLoggedIn();
+    const userInfo = this.authService.getUserInfo();
+    this.userId = userInfo?.userId!;
+    if (this.isLoggedIn && userInfo) {
+      this.userName = userInfo.userName;
+      this.isAdmin = this.authService.isAdminUser(userInfo);
+      this.profileImage = userInfo.userImage ?? '';
+    }
+  }
+
+  private resetUserInfo(): void {
+    this.userName = '';
+    this.profileImage = '';
+    this.isAdmin = false;
+    this.isSuperAdmin = false;
+  }
+
+  goToHomePage(): void {
+    if (this.isLoggedIn && (this.isSuperAdmin || this.isAdmin)) {
+      this.router.navigate(['/admin']);
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/posts']);
     }
   }
 
-  logOut():void {
+  goToProfilePage(): void {
+    const userInfo = this.authService.getUserInfo();
+    if (this.isLoggedIn) { 
+      if(this.isSuperAdmin || this.isAdmin) {
+        this.router.navigate([`/admin/profile/${userInfo?.userId}`]);
+      } else {
+        this.router.navigate([`/profile/${userInfo?.userId}`]);
+      }  
+    } else {
+      this.router.navigate(['/posts']);
+    }
+  }
+
+  logOut(): void {
     this.authService.logout();
+    this.resetUserInfo();
     this.isLoggedIn = false;
-    this.authService.logInStatusSubject.next(this.isLoggedIn);
-    this.authService.profileImageSubject.next(this.profileImage);
-    this.isLoggedIn = this.authService.isLoggedIn();
-    this.router.navigate(['/']);
+
+    // Update observables for the rest of the app
+    this.authService.logInStatusSubject.next(false);
+    this.authService.profileImageSubject.next('');
+
+    this.router.navigate(['/posts']);
   }
 
-  logIn(){
+  logIn(): void {
     this.authService.showLoginButtonSubject.next(false);
-    this.router.navigate([`/login`])
+    this.router.navigate(['/login']);
   }
 
-  signUp() {
+  signUp(): void {
     this.authService.showSignupButtonSubject.next(false);
     this.router.navigate(['/signup']);
   }
 
   ngOnDestroy(): void {
+    // Reset buttons to default state
     this.authService.showSignupButtonSubject.next(true);
     this.authService.showLoginButtonSubject.next(true);
+
+    // Clean up all subscriptions
+    this.subscriptions.unsubscribe();
   }
 
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+
+  isDark(): boolean {
+    return this.themeService.isDarkTheme();
+  }
 
 }

@@ -1,0 +1,35 @@
+.container {
+    max-width: 700px;
+    margin: auto;
+    padding: 1rem;
+}
+  
+.form-card {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+  
+mat-form-field {
+    width: 100%;
+}
+  
+button {
+    min-width: 130px;
+}
+  
+@media (max-width: 576px) {
+    .form-card {
+      padding: 1rem;
+    }
+  
+    button {
+      width: 100%;
+    }
+  
+    .row {
+      flex-direction: column;
+    }
+}
+  

@@ -1,10 +1,19 @@
-.main{
-    display: inline;
-}
-.left {
-    float: left;
-}
-.right {
-    float: right;
-    text-align: center;
-}
+.card {
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card-title {
+    font-weight: 600;
+  }
+  
+  @media (max-width: 768px) {
+    .text-end {
+      text-align: left !important;
+      margin-top: 1rem;
+    }
+  }
+  

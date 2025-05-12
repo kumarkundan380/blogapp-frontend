@@ -1,8 +1,24 @@
-<div>
+<!-- <div>
     <div class="content-container mb-5">
       <mat-icon id="close-icon" (click)="closeDialog()">close</mat-icon>
       <span class="content-span full-width">{{data.message}}</span>
     </div>
     <button mat-flat-button id="no-button" [mat-dialog-close]="false">NO</button>
     <button mat-flat-button id="yes-button" [mat-dialog-close]="true">YES</button>
+</div> -->
+
+<div class="confirm-dialog-container">
+  <div class="dialog-header">
+    <span class="dialog-title">{{ data.title || 'Confirmation' }}</span>
+    <mat-icon class="close-icon" (click)="closeDialog()" aria-label="Close dialog">close</mat-icon>
+  </div>
+
+  <div class="dialog-content">
+    <p>{{ data.message }}</p>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-stroked-button color="warn" [mat-dialog-close]="false">No</button>
+    <button mat-flat-button color="primary" [mat-dialog-close]="true">Yes</button>
+  </div>
 </div>

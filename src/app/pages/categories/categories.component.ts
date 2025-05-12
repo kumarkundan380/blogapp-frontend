@@ -12,7 +12,7 @@ import { DialogService } from 'src/app/services/dialog.service';
 })
 export class CategoriesComponent implements OnInit {
 
-  categories!: Category[];
+  categories: Category[] = [];
 
   constructor(private categoryService : CategoryService, 
     private router: Router,
@@ -47,7 +47,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   deleteCategory(category: Category) {
-    this.dialogService.openConfirmDialog('Are you sure to delete this record ?')
+    this.dialogService.openConfirmDialog('Are you sure you want to delete this category?')
     .afterClosed().subscribe((res:boolean) =>{
       if(res){
         this.categoryService.deleteCategory(category.categoryId!).subscribe({

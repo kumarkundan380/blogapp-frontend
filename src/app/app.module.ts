@@ -33,11 +33,15 @@ import { UpdateCategoryComponent } from './pages/update-category/update-category
 import { PostsComponent } from './pages/posts/posts.component';
 import { CreatePostComponent } from './pages/create-post/create-post.component';
 import { UpdatePostComponent } from './pages/update-post/update-post.component';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { EditorModule } from '@tinymce/tinymce-angular';
 import { PostPreviewComponent } from './pages/post-preview/post-preview.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
+import { StripHtmlPipe } from './strip-html.pipe';
+import { HomeRedirectComponent } from './pages/home-redirect/home-redirect.component';
+import { PostCardComponent } from './pages/post-card/post-card.component';
+
 
 @NgModule({
   declarations: [
@@ -67,7 +71,10 @@ import { VerifyEmailComponent } from './pages/verify-email/verify-email.componen
     PostPreviewComponent,
     ForgotPasswordComponent,
     ChangePasswordComponent,
-    VerifyEmailComponent
+    VerifyEmailComponent,
+    StripHtmlPipe,
+    HomeRedirectComponent,
+    PostCardComponent
   ],
   imports: [
     BrowserModule,
@@ -80,7 +87,7 @@ import { VerifyEmailComponent } from './pages/verify-email/verify-email.componen
     MaterialModule,
     HttpClientModule,
     NgxUiLoaderModule,
-    CKEditorModule,
+    EditorModule,
     NgxUiLoaderHttpModule.forRoot({ showForeground: true })
   ],
   providers: [

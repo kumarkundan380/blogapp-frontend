@@ -1,7 +1,83 @@
-.image-container {
-   height: 200px;
-   width: 200px;
+/* Outer container styling */
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: linear-gradient(to bottom right, #f1f8e9, #fce4ec);
+    padding: 20px;
 }
-/* .circle{
+
+/* Card for signup form */
+.signup-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile image */
+.image-container {
+    height: 150px;
+    width: 150px;
+    object-fit: cover;
     border-radius: 50%;
-} */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Button styling */
+.btn-secondary {
+    background-color: rgb(63, 26, 26) !important;
+    color: white;
+}
+
+.mat-icon-large {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+  
+/* Asterisk for required fields */
+.astrix {
+    color: #f44336;
+}
+
+/* Link styling */
+.link {
+    color: #007BFF;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .signup-card {
+        padding: 25px 20px;
+    }
+
+    .image-container {
+        height: 90px;
+        width: 90px;
+    }
+
+    .link {
+        font-size: 0.9rem;
+    }
+    .mat-icon-large {
+        font-size: 30px;  /* Adjust size on smaller screens */
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mat-icon-large {
+      font-size: 24px;  /* Further reduce size on extra small screens */
+      width: 24px;
+      height: 24px;
+    }
+}

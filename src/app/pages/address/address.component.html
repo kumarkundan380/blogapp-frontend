@@ -1,4 +1,4 @@
-<h1 class="text-center">Address</h1>
+<!-- <h1 class="text-center">Address</h1>
 <div class="container">
     <div *ngFor="let address of addressess">
         <div class="card mt-2">
@@ -23,5 +23,38 @@
         <button type="submit" mat-raised-button color="primary"(click)="addAddress()" class="ms-2">Add Address</button>
     </div>
     
-</div>
+</div> -->
 
+<div class="container my-4">
+    <h2 class="text-center mb-4">Addresses</h2>
+  
+    <div *ngFor="let address of addressess" class="address-card mb-4">
+      <mat-card>
+        <mat-card-content class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+  
+          <div class="address-details">
+            <p class="mb-1"><strong>{{ address.addressLine1 }}</strong>, {{ address.addressLine2 }}</p>
+            <p class="mb-1">{{ address.city }}, {{ address.state }}, {{ address.country }}</p>
+            <p class="mb-0">Postal Code: {{ address.postalCode }}</p>
+          </div>
+  
+          <div class="button-group">
+            <button mat-flat-button color="accent" (click)="editAddress(address.addressId!)">
+              <mat-icon>edit</mat-icon> Edit
+            </button>
+            <button mat-flat-button color="warn" (click)="deleteAddress(address.addressId!)">
+              <mat-icon>delete</mat-icon> Delete
+            </button>
+          </div>
+  
+        </mat-card-content>
+      </mat-card>
+    </div>
+  
+    <div class="d-flex justify-content-center mt-4">
+      <button mat-flat-button color="primary" (click)="addAddress()">
+        <mat-icon>add_location</mat-icon> Add Address
+      </button>
+    </div>
+  </div>
+  

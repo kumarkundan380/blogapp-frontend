@@ -1,36 +1,70 @@
 <div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="d-flex justify-content-center mt-3">
-                <img src="../../../assets/logo.png" alt="" class="rounded-circle image-container">
+    <div class="row w-100">
+        <div class="col-md-6 offset-md-3 login-card">
+  
+            <!-- Logo Section -->
+            <div class="text-center mb-3">
+                <img src="../../../assets/logo.png" alt="App Logo" class="image-container" />
             </div>
-            <h2 class="text-center">Login Here</h2>
-            <form [formGroup] = "logInForm" (ngSubmit) = onSubmit()>
+  
+            <!-- Title with Icon -->
+            <div class="text-center mb-4">
+                <mat-icon color="primary" class="mat-icon-large">lock</mat-icon>
+                <h2 class="mt-2">Welcome Back</h2>
+                <p class="text-muted">Login to continue to BlogApp</p>
+            </div>
+  
+            <!-- Login Form -->
+            <form [formGroup]="logInForm" (ngSubmit)="onSubmit()" novalidate>
+  
                 <!-- Username Field -->
                 <mat-form-field class="w-100" appearance="outline">
-                    <mat-label>Username</mat-label>
-                    <input matInput placeholder="Enter Here" formControlName = "userName">
-                    <mat-error *ngIf ="logInForm.get('userName')?.hasError('required') && logInForm.get('userName')?.touched">Username is required</mat-error>
+                    <mat-label>Username or Email Id</mat-label>
+                    <input matInput formControlName="userName" placeholder="Enter Username or Email Id" />
+                    <mat-error *ngIf="logInForm.get('userName')?.hasError('required') && logInForm.get('userName')?.touched">
+                        Username or Email is required
+                    </mat-error>
                 </mat-form-field>
-
+  
                 <!-- Password Field -->
                 <mat-form-field class="w-100" appearance="outline">
                     <mat-label>Password</mat-label>
-                    <input matInput [type]="hide ? 'password' : 'text'" placeholder="Enter Here" formControlName="password">
-                    <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    <input matInput [type]="hide ? 'password' : 'text'" placeholder="Enter Password" formControlName="password" />
+                    <button mat-icon-button matSuffix (click)="hide = !hide">
+                        <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
                     </button>
-                    <mat-error *ngIf ="logInForm.get('password')?.hasError('required') && logInForm.get('password')?.touched">Password is required</mat-error>
+                    <mat-error *ngIf="logInForm.get('password')?.hasError('required') && logInForm.get('password')?.touched">
+                        Password is required
+                    </mat-error>
                 </mat-form-field>
-
-                <div class="d-flex justify-content-center">
-                    <button type="submit" mat-raised-button color="primary" [disabled]="!logInForm.valid">Login</button>
-                    <button type="reset" mat-raised-button color="accent" class="ms-2">Reset</button>
+  
+                <!-- Google reCAPTCHA -->
+                <div class="d-flex justify-content-center mt-2">
+                    <div id="recaptcha-container"></div>
+                </div>
+                <div *ngIf="captchaError" class="error text-danger text-center mt-2">
+                    Recaptcha not verified.
+                </div>
+  
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" mat-raised-button color="primary" [disabled]="!logInForm.valid || !captchaToken">
+                        <mat-icon>check_circle</mat-icon>
+                        Login
+                    </button>
+                    <button type="reset" mat-raised-button color="accent" class="ms-2">
+                        <mat-icon>refresh</mat-icon>
+                        Reset
+                    </button>
                 </div>
             </form>
-            <div class="d-flex justify-content-end mt-3">
-                <a class="link" (click)="frogotPassword()">Forgot Password</a>
+  
+            <!-- Forgot Password Link -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <a class="link" (click)="forgotPassword()">Forgot Password?</a>
+                <span class="text-muted">Don’t have an account? <a class="link" routerLink="/signup">Sign Up</a></span>
             </div>
         </div>
     </div>
 </div>
+  

@@ -1,6 +1,12 @@
-export interface BlogappResponse<T> {
+export interface BlogAppResponse<T> {
 
-    status:string;
+    status: ResponseStatus; 
     message:string;
     body: T;
+}
+
+export enum ResponseStatus {
+    SUCCESS = "SUCCESS",
+    ERROR = "ERROR",
+    FAILURE = "FAILURE"
 }

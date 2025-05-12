@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { Address } from '../model/address';
 import { BlogappPageableResponse } from '../model/blogapp-pageable-response';
-import { BlogappResponse } from '../model/blogapp-response';
+import { BlogAppResponse } from '../model/blogapp-response';
 import { ChangePassword } from '../model/change-password';
 import { ForgotPassword } from '../model/forgot-password';
 import { Role } from '../model/role';
 import { User } from '../model/user';
+import { UserSearchRequest } from '../model/user-search-request';
 import { VerifyEmail } from '../model/verify-email';
 
 @Injectable({
@@ -15,72 +17,100 @@ import { VerifyEmail } from '../model/verify-email';
 })
 export class UserService {
 
-  private BASE_URL = "http://localhost:8080/api/v1/users";
+  private readonly BASE_URL = `${environment.apiBaseUrl}/users`; 
+  private readonly BASE_URL_ROLES = `${environment.apiBaseUrl}/roles`; 
+  
   userSubject = new Subject<User>();
   userRoles = new Subject<string[]>();
 
   constructor(private httpClient : HttpClient) { }
 
-  registerUser(formData: FormData): Observable<BlogappResponse<User>> {
-    return this.httpClient.post<BlogappResponse<User>>(`${this.BASE_URL}`, formData);
+  registerUser(user: User, file?: File | null): Observable<BlogAppResponse<User>> {
+    
+    let formData = new FormData();
+    // Append user details as JSON Blob
+    formData.append("userDTO", new Blob([JSON.stringify(user)], { type: "application/json" }));
+    // Append image file (if exists)
+    if (file) {
+      formData.append("image", file);
+    }
+    return this.httpClient.post<BlogAppResponse<User>>(`${this.BASE_URL}`, formData);
   }
 
-  getUser(userId : number): Observable<BlogappResponse<User>> {
-    return this.httpClient.get<BlogappResponse<User>>(`${this.BASE_URL}/${userId}`);
+  getUser(userId : number): Observable<BlogAppResponse<User>> {
+    
+    return this.httpClient.get<BlogAppResponse<User>>(`${this.BASE_URL}/${userId}`);
   }
 
-  getAllUser(pageNumber:number = 0, pageSize:number = 10): Observable<BlogappResponse<BlogappPageableResponse<User[]>>>{
-    return this.httpClient.get<BlogappResponse<BlogappPageableResponse<User[]>>>(`${this.BASE_URL}?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+  getAllUser(userSearchRequest: UserSearchRequest,pageNumber:number = 0, pageSize:number = 10): Observable<BlogAppResponse<BlogappPageableResponse<User[]>>>{
+    
+    return this.httpClient.post<BlogAppResponse<BlogappPageableResponse<User[]>>>(`${this.BASE_URL}/search-user?pageNumber=${pageNumber}&pageSize=${pageSize}`, userSearchRequest);
   }
 
-  updateUser(formData: FormData, userId: number) : Observable<BlogappResponse<User>> {
-    return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}`, formData);
+  updateUser(user: User, userId: number, file?: File | null): Observable<BlogAppResponse<User>> {
+  
+    let formData = new FormData();
+    // Append user details as JSON Blob
+    formData.append("userDTO", new Blob([JSON.stringify(user)], { type: "application/json" }));
+    // Append image file (if exists)
+    if (file) {
+      formData.append("image", file);
+    }
+    return this.httpClient.put<BlogAppResponse<User>>(`${this.BASE_URL}/${userId}`, formData);
+  }
+  
+
+  getAllRoles(): Observable<BlogAppResponse<Role[]>> {
+    return this.httpClient.get<BlogAppResponse<Role[]>>(`${this.BASE_URL_ROLES}`);
   }
 
-  getAllRoles(): Observable<BlogappResponse<Role[]>> {
-    return this.httpClient.get<BlogappResponse<Role[]>>(`${this.BASE_URL}/roles`);
+  getRolesByUserId(userId: number): Observable<BlogAppResponse<Role[]>> {
+    return this.httpClient.get<BlogAppResponse<Role[]>>(`${this.BASE_URL}/${userId}/roles`);
   }
 
 
-  updateRoles(userId:number,rolesList:Role[]): Observable<BlogappResponse<User>> {
-    return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}/roles`,rolesList);
+  addRolesByUserId(userId:number,rolesList:Role[]): Observable<BlogAppResponse<Role[]>> {
+    return this.httpClient.put<BlogAppResponse<Role[]>>(`${this.BASE_URL}/${userId}/roles`,rolesList);
   }
 
-  deleteUser(userId:number): Observable<BlogappResponse<void>> {
-    return this.httpClient.delete<BlogappResponse<void>>(`${this.BASE_URL}/${userId}`,);
+  removeRoleByUserId(userId:number,role:Role): Observable<BlogAppResponse<Role[]>> {
+    return this.httpClient.put<BlogAppResponse<Role[]>>(`${this.BASE_URL}/${userId}/roles/remove`,role);
   }
 
-  addAddress(address: Address, userId: number) : Observable<BlogappResponse<User>> {
-    return this.httpClient.post<BlogappResponse<User>>(`${this.BASE_URL}/${userId}/address`, address);
+  deleteUser(userId:number): Observable<BlogAppResponse<void>> {
+    return this.httpClient.delete<BlogAppResponse<void>>(`${this.BASE_URL}/${userId}`,);
   }
 
-  getAllAddressess(userId: number) : Observable<BlogappResponse<Address[]>> {
-    return this.httpClient.get<BlogappResponse<Address[]>>(`${this.BASE_URL}/${userId}/address`);
+  addAddress(address: Address, userId: number) : Observable<BlogAppResponse<User>> {
+    return this.httpClient.post<BlogAppResponse<User>>(`${this.BASE_URL}/${userId}/addresses`, address);
   }
 
-  updateAddress(userId: number, addressId:number, address: Address) : Observable<BlogappResponse<User>> {
-    return this.httpClient.put<BlogappResponse<User>>(`${this.BASE_URL}/${userId}/address/${addressId}`, address);
+  getAllAddressess(userId: number) : Observable<BlogAppResponse<Address[]>> {
+    return this.httpClient.get<BlogAppResponse<Address[]>>(`${this.BASE_URL}/${userId}/addresses`);
   }
 
-  getOneAddress(userId: number, addressId:number) : Observable<BlogappResponse<Address>> {
-    return this.httpClient.get<BlogappResponse<Address>>(`${this.BASE_URL}/${userId}/address/${addressId}`);
+  updateAddress(userId: number, addressId:number, address: Address) : Observable<BlogAppResponse<User>> {
+    return this.httpClient.put<BlogAppResponse<User>>(`${this.BASE_URL}/${userId}/addresses/${addressId}`, address);
   }
 
-  deleteAddress(userId: number, addressId:number) : Observable<BlogappResponse<void>> {
-    return this.httpClient.delete<BlogappResponse<void>>(`${this.BASE_URL}/${userId}/address/${addressId}`);
+  getOneAddress(userId: number, addressId:number) : Observable<BlogAppResponse<Address>> {
+    return this.httpClient.get<BlogAppResponse<Address>>(`${this.BASE_URL}/${userId}/addresses/${addressId}`);
   }
 
-  forgotPassword(forgotPassword: ForgotPassword) : Observable<BlogappResponse<string>> {
-    return this.httpClient.post<BlogappResponse<string>>(`${this.BASE_URL}/forgot-password`,forgotPassword);
+  deleteAddress(userId: number, addressId:number) : Observable<BlogAppResponse<void>> {
+    return this.httpClient.delete<BlogAppResponse<void>>(`${this.BASE_URL}/${userId}/addresses/${addressId}`);
   }
 
-  changePassword(changePassword: ChangePassword) : Observable<BlogappResponse<string>> {
-    return this.httpClient.post<BlogappResponse<string>>(`${this.BASE_URL}/change-password`,changePassword);
+  forgotPassword(forgotPassword: ForgotPassword) : Observable<BlogAppResponse<string>> {
+    return this.httpClient.post<BlogAppResponse<string>>(`${this.BASE_URL}/forgot-password`,forgotPassword);
   }
 
-  verifyEmail(verifyEmail: VerifyEmail) : Observable<BlogappResponse<string>> {
-    return this.httpClient.post<BlogappResponse<string>>(`${this.BASE_URL}/verify-email`,verifyEmail);
+  changePassword(changePassword: ChangePassword) : Observable<BlogAppResponse<string>> {
+    return this.httpClient.post<BlogAppResponse<string>>(`${this.BASE_URL}/change-password`,changePassword);
   }
 
+  verifyEmail(verifyEmail: VerifyEmail) : Observable<BlogAppResponse<string>> {
+    return this.httpClient.post<BlogAppResponse<string>>(`${this.BASE_URL}/verify-email`,verifyEmail);
+  }
 
 }

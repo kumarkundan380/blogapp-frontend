@@ -1,10 +1,64 @@
-.main{
-    display: inline;
+.card {
+  transition: box-shadow 0.3s ease;
 }
-.left {
-    float: left;
+.card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
-.right {
-    float: right;
-    text-align: center;
+.card-title {
+  font-weight: 600;
 }
+  
+.badge {
+  font-size: 0.9rem;
+}
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+  
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+  
+.search-input {
+  min-width: 200px;
+  flex-grow: 1;
+}
+  
+.pagination-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+  
+button.active-page {
+  background-color: #ff4081;
+  color: white;
+  font-weight: bold;
+}
+
+
+
+@media (max-width: 768px) {
+    
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .input-group .form-select,
+  .input-group .form-control,
+  .input-group .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+  

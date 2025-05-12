@@ -7,4 +7,10 @@ import { Component } from '@angular/core';
 })
 export class AdminDashboardComponent {
 
+  isSidebarVisible = false;
+
+  toggleSidebar(): void {
+    this.isSidebarVisible = !this.isSidebarVisible;
+  }
+
 }

@@ -24,11 +24,17 @@ import { AdminHomeComponent } from './pages/admin-home/admin-home.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
+import { HomeRedirectComponent } from './pages/home-redirect/home-redirect.component';
+import { NoAuthGuard } from './guards/no-auth.guard';
 
 
 const routes: Routes = [
   {
     path: '',
+    component: HomeRedirectComponent
+  },
+  {
+    path: 'posts',
     component: PostsComponent
   },
   {
@@ -38,9 +44,10 @@ const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent
+    // canActivate: [NoAuthGuard]
   },
   {
-    path: 'posts/:postId',
+    path: 'posts/:slug',
     component: PostPreviewComponent
   },
   {
@@ -56,7 +63,7 @@ const routes: Routes = [
     component: VerifyEmailComponent
   },
   {
-    path:'profile',
+    path:'profile/:userId',
     component: ProfileComponent,
     canActivate: [LoginGuard],
   },
@@ -64,39 +71,20 @@ const routes: Routes = [
     path: 'admin',
     component: AdminDashboardComponent,
     canActivate: [AdminGuard],
+    canActivateChild: [AdminGuard], // Protects all child routes
     children: [
-      {
-        path:'',
-        component: AdminHomeComponent
-      },
-      {
-        path:'user-list',
-        component: UserListComponent
-      },
-      {
-        path:':userId/roles',
-        component: RolesComponent
-      },
-      {
-        path:'profile',
-        component: ProfileComponent,
-      },
-      {
-        path:'categories',
-        component: CategoriesComponent
-      },
-      {
-        path:'add-category',
-        component: AddCategoryComponent
-      },
-      {
-        path:'update-category/:categoryId',
-        component: UpdateCategoryComponent
-      },
-      {
-        path:'posts',
-        component: PostsComponent
-      }
+      { path: '', component: AdminHomeComponent },
+      { path: 'user-list', component: UserListComponent },
+      { path: 'update-user/:userId', component: UpdateUserComponent},
+      { path: 'all-address/:userId', component: AddressComponent},
+      { path: 'add-address/:userId', component: AddAddressComponent},
+      { path: 'edit-address/:userId/:addressId', component: EditAddressComponent},
+      { path: ':userId/roles', component: RolesComponent },
+      { path: 'profile/:userId', component: ProfileComponent },
+      { path: 'categories', component: CategoriesComponent },
+      { path: 'add-category', component: AddCategoryComponent },
+      { path: 'update-category/:categoryId', component: UpdateCategoryComponent },
+      { path: 'posts', component: PostsComponent }
     ]
   },
   {
@@ -120,16 +108,17 @@ const routes: Routes = [
     canActivate: [LoginGuard]
   },
   {
-    path: 'address/:userId/:addressId',
+    path: 'edit-address/:userId/:addressId',
     component: EditAddressComponent,
     canActivate: [LoginGuard]
   },
   {
     path:'create-post',
     component: CreatePostComponent,
+    canActivate: [LoginGuard]
   },
   {
-    path:'update-post/:postId',
+    path:'update-post/:slug',
     component: UpdatePostComponent,
     canActivate: [LoginGuard]
   }

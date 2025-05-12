@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Category } from 'src/app/model/category';
-import { Post } from 'src/app/model/post';
+import { Post, PostStatus } from 'src/app/model/post';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { PostService } from 'src/app/services/post.service';
+
 
 @Component({
   selector: 'app-update-post',
@@ -16,157 +16,197 @@ import { PostService } from 'src/app/services/post.service';
 })
 export class UpdatePostComponent {
 
+  @ViewChild('fileInput') fileInput!: ElementRef;
+  selectedFileName: string = '';
   updatePostForm!: FormGroup;
-  isAdmin!: boolean;
+  isAdmin: boolean = false;
+  isSuperAdmin: boolean = false;
+  statusChanged: boolean = false;
   post!: Post;
   postId!: number;
   userId!: number;
-  file!: Blob;
   selectedFile: File | null = null;
-  imageSrc: string | ArrayBuffer | null | undefined = null;
+  imageSrc: string | ArrayBuffer | null = null;
   categories!: Category[];
-  statusList!: string[]
-  public Editor = ClassicEditor;
+  statusList = Object.values(PostStatus);
+  config = { 
+    height: 300,
+    menubar: false,
+    plugins: 'link image code lists',
+    toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | code'
+  }
+  slug: string = '';
+  formChanged = false;
 
-  constructor(private authService : AuthService, 
+  constructor(
+    private authService: AuthService,
     private activateRoute: ActivatedRoute,
     private categoryService: CategoryService,
     private postService: PostService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar){
-    
-  }
+    private _snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
-    this.statusList = new Array("APPROVED","PENDING","DELETED");
-    this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
-    this.userId = this.authService.getUserInfo().userId!;
-    this.postId = this.activateRoute.snapshot.params['postId'];
+
+    const userInfo = this.authService.getUserInfo();
+    if (userInfo && userInfo.userId != null) {
+      this.userId = userInfo.userId;
+      this.isSuperAdmin = this.authService.isSuperAdminUser(userInfo);
+      this.isAdmin = this.authService.isAdminUser(userInfo);
+    } else {
+      this.showMessage("User is not valid");
+      return;
+    }
+    this.slug = this.activateRoute.snapshot.params['slug'];
+    this.initializeForm();
     this.getAllCategories();
-    this.getPost(this.postId);
-    if(this.isAdmin){
-      this.updatePostForm = this.formBuilder.group({
-        postTitle: new FormControl('',Validators.required),
-        postContent: new FormControl('',Validators.required),
-        categoryId: new FormControl('', Validators.required),
-        status: new FormControl('',Validators.required)
-      });
-    } else {
-      this.updatePostForm = this.formBuilder.group({
-        postTitle: new FormControl('',Validators.required),
-        postContent: new FormControl('',Validators.required),
-        categoryId: new FormControl('', Validators.required),
-      });
-    }
-    
+    this.getPost(this.slug);
   }
 
-  getPost(postId:number){
-    this.postService.getPost(postId).subscribe({
-      next: (data) => {
-        this.post = data.body;
-        if(this.isAdmin){
-          this.updatePostForm.patchValue({
-            postTitle:this.post.postTitle,
-            postContent:this.post.postContent,
-            categoryId:this.post.category?.categoryId,
-            status:this.post?.status!
-          });
-        } else{
-          this.updatePostForm.patchValue({
-            postTitle:this.post.postTitle,
-            postContent:this.post.postContent,
-            categoryId:this.post.category?.categoryId,
-          });
-        }
-        
-      },
-      error:(error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
-    })
-  }
-
-  getAllCategories(){
-    this.categoryService.getAllCategory().subscribe({
-      next: (data) => {
-        this.categories = data.body
-      },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
-    })
-  }
-
-  onSubmit(){
-    if(this.isAdmin){
-      this.post = {
-        postTitle:this.updatePostForm.get('postTitle')?.value,
-        postContent:this.updatePostForm.get('postContent')?.value,
-        categoryId:this.updatePostForm.get('categoryId')?.value,
-        status:this.updatePostForm.get('status')?.value,
-        userId:this.userId,
-      }
-    } else {
-      this.post = {
-        postTitle:this.updatePostForm.get('postTitle')?.value,
-        postContent:this.updatePostForm.get('postContent')?.value,
-        categoryId:this.updatePostForm.get('categoryId')?.value,
-        userId:this.userId
-      }
-    }
-    
-    this.updatePost(this.post,this.postId);
-  }
-
-  onFileSelected(event: any) {
-    this.file = event.target.files[0];
-    if (this.file) {
-      this.selectedFile = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imageSrc = e.target?.result;
-      };
-      reader.readAsDataURL(this.file);
-    }
-  }
-
-  updatePost(post:Post, postId:number){
-    let formData = new FormData();
-    formData.append("image", this.file);
-    formData.append("postData",JSON.stringify(post));
-    this.postService.updatePost(formData,postId).subscribe({
-      next: (data) => {
-          this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-        this.updatePostForm.reset();
-        this.goToHomePage();
-      },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
+  initializeForm(): void {
+    this.updatePostForm = this.formBuilder.group({
+      postTitle: ['', Validators.required],
+      postContent: ['', Validators.required],
+      categoryId: ['', Validators.required],
+      ...((this.isSuperAdmin || this.isAdmin) && { status: ['', Validators.required] }) // Add status field if super admin or admin
     });
   }
 
-  goToHomePage() {
-    if(this.isAdmin) {
-      this.router.navigate([`/admin/posts`])
-    } else {
-      this.router.navigate(['/']);
+  getPost(slug: string): void {
+
+    this.postService.getPost(slug).subscribe({
+      next: (data) => {
+        this.post = data.body;
+        this.populateForm(data.body);
+      },
+      error: (error) => this.showMessage(error.error?.errorMessage)
+    });
+  }
+
+  // Populate form fields with user data
+  private populateForm(post: Post): void {
+    
+    if (!post) return;
+
+    this.updatePostForm.patchValue({
+      postTitle: this.post.postTitle,
+      postContent: this.post.postContent,
+      categoryId: this.post.category?.categoryId,
+      ...((this.isSuperAdmin || this.isAdmin) && { status: this.post?.status})
+    });
+
+    this.updatePostForm.valueChanges.subscribe(() => {
+      this.formChanged = !this.isFormUnchanged();
+    });
+
+      // Set Profile Image
+    if (post.imageUrl) {
+      this.imageSrc = post.imageUrl;
+      this.selectedFileName = '';
     }
   }
 
+  private isFormUnchanged(): boolean {
+    
+    const formValue = this.updatePostForm.value;
+  
+    const trim = (val: any) => typeof val === 'string' ? val.trim() : val;
+  
+    const updatedPost: Partial<Post> = {
+      postTitle: trim(formValue.postTitle),
+      postContent: trim(formValue.postContent),
+      categoryId: trim(formValue.categoryId),
+      ...((this.isSuperAdmin || this.isAdmin) && {
+        status: trim(formValue.status)
+      })
+    };
+    
+    const originalPost = {
+      postTitle: this.post.postTitle,
+      postContent: this.post.postContent,
+      categoryId: this.post.category?.categoryId,
+      ...((this.isSuperAdmin || this.isAdmin) && {
+        status: this.post.status
+      })
+    };
+    // Compare JSON stringified versions
+    return JSON.stringify(updatedPost) === JSON.stringify(originalPost);
+  }
+
+  getAllCategories(): void {
+
+    this.categoryService.getAllCategory().subscribe({
+      next: (data) => (this.categories = data.body),
+      error: (error) => this.showMessage(error.error?.errorMessage)
+    });
+  }
+
+  onSubmit(): void {
+
+    if (this.updatePostForm.invalid) return;
+  
+     const formValue = this.updatePostForm.value;
+     // If no changes made and no new file uploaded, don't submit
+     if (this.isFormUnchanged() && !this.selectedFile) {
+      this.showMessage("No meaningful changes detected.");
+      return;
+    }
+    this.statusChanged = (this.isSuperAdmin || this.isAdmin) && formValue.status !== this.post.status;
+    const updatedPost: Post = {
+      ...this.updatePostForm.value,
+      userId: this.userId,
+      isEdited: !this.statusChanged
+    };
+    // this.updatePost(updatedPost, this.postId);
+    this.updatePost(updatedPost, this.slug);
+  }
+
+  onReset(): void {
+    this.populateForm(this.post);
+  }
+
+  // Handle file selection
+  onFileSelected(event: any): void {
+
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.selectedFile = input.files[0];
+      this.selectedFileName = this.selectedFile.name;
+      const reader = new FileReader();
+      reader.onload = (e) => this.imageSrc = e.target?.result ?? null;
+      reader.readAsDataURL(this.selectedFile);
+    } else {
+      this.selectedFile = null;
+      this.imageSrc = null;
+    }
+    // File selection counts as a change
+    this.formChanged = true;
+  }
+
+  updatePost(post: Post, slug: string): void {
+    
+    this.postService.updatePost(post, slug, this.selectedFile).subscribe({
+      next: (data) => {
+        this.showMessage(data.message);
+        this.updatePostForm.reset();
+        this.goToHomePage();
+      },
+      error: (error) => this.showMessage(error.error?.errorMessage)
+    });
+  }
+
+  goToHomePage(): void {
+
+    this.router.navigate([`/posts/${this.slug}`]);
+  }
+
+  private showMessage(message: string): void {
+    this._snackBar.open(message, 'OK', {
+      duration: 3000,
+      verticalPosition: 'top'
+    });
+  }
 
 }

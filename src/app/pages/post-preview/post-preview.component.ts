@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Post } from 'src/app/model/post';
+import { Post, PostStatus } from 'src/app/model/post';
 import { User } from 'src/app/model/user';
 import { Comment } from 'src/app/model/comment';
 import { AuthService } from 'src/app/services/auth.service';
@@ -18,473 +18,344 @@ import { Activity } from 'src/app/model/activity';
 })
 export class PostPreviewComponent implements OnInit {
 
-  isAdmin!: boolean;
-  post!: Post;
-  user!: User;
-  postId!: number;
-  userId!: number;
-  name!: string;
-  comments!: Comment[];
-  addCommentForm!: FormGroup;
-  editCommentForm!: FormGroup;
-  formBuilder: any;
-  comment!: Comment;
-  isEdit = false;
-  updateComment!: Comment;
-  commentId!: number;
-  isLoggedIn!: boolean;
-  activity!: Activity;
-  likeCount: number = 0;
-  disLikeCount: number = 0;
-  likedUserId!: number[];
-  disLikedUserId!: number[];
-  activityId!: number;
-  postLiked!: boolean;
-  postDisLiked!: boolean;
+  isAdmin = false;
+  isSuperAdmin = false;
+  post: Post | null = null;
+  comments: Comment[] = [];
+  addCommentForm: FormGroup;
+  editCommentForm: FormGroup;
+  commentId: number | null = null;
+  postId: number = 0;
+  isLoggedIn = false;
+  likeCount = 0;
+  disLikeCount = 0;
+  postLiked = false;
+  postDisLiked = false;
+  canEditOrDeleteComment = false;
+  @ViewChild('commentBox') commentBoxRef?: ElementRef;
+  ignoreNextClick = false;
+  currentUser: User | null = null;
+  editingCommentId: number | null = null;
+  slug: string = '';
 
-  constructor(private authService : AuthService, 
+  constructor(
+    private authService: AuthService,
     private activateRoute: ActivatedRoute,
-    private router : Router,
+    private router: Router,
     private postService: PostService,
     private _snackBar: MatSnackBar,
-    private dialogService: DialogService){
-    
-  }
-
-  ngOnInit(): void {
-    this.postId = this.activateRoute.snapshot.params['postId'];
-    this.getPost(this.postId); 
+    private dialogService: DialogService
+  ) {
     this.addCommentForm = new FormGroup({
       content: new FormControl('', Validators.required)
     });
+
     this.editCommentForm = new FormGroup({
       content: new FormControl('', Validators.required)
     });
-    this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
+  }
+  
+
+  ngOnInit(): void {
+    this.slug = this.activateRoute.snapshot.params['slug'];
+    this.getPost(this.slug);
     this.isLoggedIn = this.authService.isLoggedIn();
+    this.initializeRoles();
   }
 
-  getPost(postId:number){
-    this.postService.getPost(postId).subscribe({
-      next: (data) => {
-        this.post = data.body;
-        this.comments = data.body.comments!;
-        this.getLikeAndDisLikeCount(data.body); 
+  ngAfterViewInit(): void {
+    // This lifecycle hook ensures that @ViewChild is correctly initialized.
+  }
+
+  private initializeRoles(): void {
+    this.currentUser = this.authService.getUserInfo();
+    if (this.currentUser) {
+      this.isSuperAdmin = this.authService.isSuperAdminUser(this.currentUser);
+      this.isAdmin = this.authService.isAdminUser(this.currentUser);
+    }
+  }
+
+  getPost(slug: string): void {
+    
+    this.postService.getPost(slug).subscribe({
+      next: ({ body }) => {
+        this.post = body;
+        this.comments = body.comments || [];
+        this.processPostActivities(body.activities || []);
+        this.processCommentActivities();
       },
-      error:(error) => {
-        this._snackBar.open(error.error?.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
-    })
-  }
-
-  getLikeAndDisLikeCount(post:Post){
-    if(post.activities!?.length>0){
-      this.likeCount = post.activities!.filter(activity => activity.activityType==="LIKE").length;
-      this.likedUserId = post.activities!.filter(activity => activity.entityType==="LIKE").map(activity => activity.user.userId!);
-      this.disLikeCount = post.activities!.filter(activity => activity.activityType==="DISLIKE").length;
-      this.disLikedUserId = post.activities!.filter(activity => activity.entityType==="DISLIKE").map(activity => activity.user.userId!);
-    } else {
-      this.likeCount = 0;
-      this.disLikeCount = 0;
-    }
-    this.postLiked = this.isPostLiked();
-    this.postDisLiked = this.isPostDisLiked();
-    if(this.comments!.length>0){
-      this.setCommentLikeAndDisLike();
-    }
-    
-  }
-
-  setCommentLikeAndDisLike(){
-    for (let i = 0; i < this.comments!.length; i++) {
-      this.comments![i].isCommentLiked =  this.isCommentLiked(this.comments![i]);
-      this.comments![i].isCommentDisliked =  this.isCommentDisLiked(this.comments![i]);
-      this.comments![i].commentLikedCount = this.comments![i].activities!.filter(activity => activity.activityType==="LIKE").length;
-      this.comments![i].commentDisLikedCount = this.comments![i].activities!.filter(activity => activity.activityType==="DISLIKE").length;
-    }
-  }
-
-  
-
-  isPostLiked(){
-    return (this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo()?.userId)?.activityType == "LIKE");
-  }
-
-  isCommentLiked(comment: Comment){
-    return (comment.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo()?.userId)?.activityType == "LIKE");
+      error: (error) => this.showMessage(error.error?.errorMessage)
+    });
   }
   
-  isPostDisLiked(){
-    return (this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo()?.userId)?.activityType == "DISLIKE");
-  }
-
-  isCommentDisLiked(comment: Comment){
-    return (comment.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo()?.userId)?.activityType == "DISLIKE");
-  }
-
-  likePost(activityType:string, entityType: string, postId:number){
-    if(!this.authService.isLoggedIn()){
-      this.router.navigate(['/login']);
-    } else {
-      if(this.isPostLiked()){
-        this.postDisLiked = false;
-        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.deleteActivity(this.activityId);
-      } else if(this.isPostDisLiked()){
-        this.postLiked = false;
-        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          postId: postId,
-        }
-        this.updateActivity(this.activity,this.activityId);
-      } else{
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          postId: postId,
-        }
-        this.createActivity(this.activity);
-      }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (this.ignoreNextClick || !this.commentBoxRef) {
+      return;
     }
+    const clickedInside = this.commentBoxRef.nativeElement.contains(event.target);
+    if (!clickedInside) {
+      this.commentId = null;
+    }
+  }
+
+  processPostActivities(activities: Activity[]): void {
     
+    this.likeCount = activities.filter(a => a.activityType === "LIKE").length;
+    this.disLikeCount = activities.filter(a => a.activityType === "DISLIKE").length;
+
+    const userActivity = activities.find(a => a.user.userId === this.currentUser?.userId);
+    this.postLiked = userActivity?.activityType === "LIKE";
+    this.postDisLiked = userActivity?.activityType === "DISLIKE";
   }
 
-  disLikePost(activityType:string,entityType: string, postId:number){
-    if(!this.authService.isLoggedIn()){
-      this.router.navigate(['/login']);
-    } else {
-      if(this.isPostDisLiked()){
-        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.deleteActivity(this.activityId);
-      } else if(this.isPostLiked()){
-        this.activityId = this.post.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          postId: postId,
-        }
-        this.updateActivity(this.activity,this.activityId);
-      } else {
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          postId: postId,
-        }
-        this.createActivity(this.activity);
-      }
-    }
-  }
-
-  likeComment(activityType:string, entityType: string, comment:Comment){
-    if(!this.authService.isLoggedIn()){
-      this.router.navigate(['/login']);
-    } else {
-      if(this.isCommentLiked(comment)){
-        comment.isCommentLiked = false;
-        this.activityId = comment.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.deleteActivity(this.activityId);
-      } else if(this.isCommentDisLiked(comment)){
-        comment.isCommentDisliked=false;
-        comment.isCommentLiked = true;
-        this.activityId = comment.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          commentId: comment.commentId,
-        }
-        this.updateActivity(this.activity,this.activityId);
-      } else{
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          commentId: comment.commentId,
-        }
-        comment.isCommentLiked = true;
-        this.createActivity(this.activity);
-      }
-    }
+  processCommentActivities(): void {
     
+    this.comments.forEach(comment => {
+      const activities = comment.activities || [];
+      const userActivity = activities.find(a => a.user.userId === this.currentUser?.userId);
+      comment.isCommentLiked = userActivity?.activityType === "LIKE";
+      comment.isCommentDisliked = userActivity?.activityType === "DISLIKE";
+      comment.commentLikedCount = activities.filter(a => a.activityType === "LIKE").length;
+      comment.commentDisLikedCount = activities.filter(a => a.activityType === "DISLIKE").length;
+    });
   }
 
-  disLikeComment(activityType:string,entityType: string, comment:Comment){
-    if(!this.authService.isLoggedIn()){
+  togglePostReaction(type: 'LIKE' | 'DISLIKE'): void {
+    
+    if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
-    } else {
-      if(this.isCommentDisLiked(comment)){
-        comment.isCommentDisliked = false;
-        this.activityId = comment.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.deleteActivity(this.activityId);
-      } else if(this.isCommentLiked(comment)){
-        comment.isCommentLiked = false;
-        comment.isCommentDisliked = true;
-        this.activityId = comment.activities!.find(activity => activity.user.userId! === this.authService.getUserInfo().userId)?.activityId!;
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          commentId: comment.commentId,
-        }
-        this.updateActivity(this.activity,this.activityId);
-      } else {
-        this.activity = {
-          activityType: activityType,
-          entityType: entityType,
-          user: this.authService.getUserInfo(),
-          userId: this.authService.getUserInfo().userId!,
-          commentId: comment.commentId,
-        }
-        comment.isCommentDisliked = true;
-        this.createActivity(this.activity);
-      }
+      return;
     }
+    if(PostStatus.PUBLISHED !== this.post?.status){
+      return;
+    }
+    const activity = this.post?.activities?.find(a => a.user.userId === this.currentUser?.userId);
+    const currentType = activity?.activityType;
+    const activityId = activity?.activityId;
+
+    if (currentType === type) {
+      if (activityId) {
+        this.deleteActivity(activityId);
+      }
+    } else if (currentType) {
+      if (activityId) {
+        this.updateActivity(this.buildActivity(type, 'POST', this.post?.postId), activityId);
+      }
+    } else {
+      this.createActivity(this.buildActivity(type, 'POST', this.post?.postId));
+    }
+  }
+
+  toggleCommentReaction(comment: Comment, type: 'LIKE' | 'DISLIKE'): void {
+    
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const activity = comment.activities?.find(a => a.user.userId === this.currentUser?.userId);
+    const currentType = activity?.activityType;
+    const activityId = activity?.activityId;
+
+    if (currentType === type) {
+      if (activityId) {
+        this.deleteActivity(activityId);
+      }
+    } else if (currentType) {
+      if (activityId) {
+        this.updateActivity(this.buildActivity(type, 'COMMENT', undefined, comment.commentId), activityId);
+      }
+    } else {
+      this.createActivity(this.buildActivity(type, 'COMMENT', undefined, comment.commentId));
+    }
+  }
+
+  buildActivity(type: string, entityType: string, postId?: number, commentId?: number): Activity {
+    
+    if (!this.currentUser || !this.currentUser.userId) {
+      throw new Error("Current user is not defined");
+    }
+    return {
+      activityType: type,
+      entityType,
+      user: this.currentUser,
+      userId: this.currentUser.userId,
+      postId,
+      commentId
+    };
   }
   
-
-  isPostAlreadyLiked(){
-    return this.likedUserId?.includes(this.authService.getUserInfo().userId!);
-  }
-
-  isPostAlreadyDisLiked(){
-    return this.disLikedUserId?.includes(this.authService.getUserInfo().userId!);
-  }
-
-  createActivity(activity: Activity) {
+  createActivity(activity: Activity): void {
     this.postService.createActivity(activity).subscribe({
-      next: (data) => {
-          this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-        this.getPost(this.postId);
+      next: () => {
+        this.getPost(this.slug);
       },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
+      error: (error) => this.showMessage(error.error?.errorMessage)
     });
-
   }
+  
 
-  updateActivity(activity: Activity, activityId: number) {
+  updateActivity(activity: Activity, activityId: number): void {
     this.postService.updateActivity(activity, activityId).subscribe({
-      next: (data) => {
-          this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-        this.getPost(this.postId);
+      next: () => {
+        this.getPost(this.slug);
       },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
-    });
-
-  }
-
-  deleteActivity(activityId: number) {
-    this.postService.deleteActivity(activityId).subscribe({
-      next: (data) => {
-          this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-        this.getPost(this.postId!);
-      },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
-    });
-
-  }
-
-  goToHomePage() {
-    if(this.isAdmin) {
-      this.router.navigate([`/admin`])
-    } else {
-      this.router.navigate(['/']);
-    }
-  }
-
-  editPost(post:Post){
-    this.router.navigate([`update-post/${post.postId}`]);
-  }
-
-  deletePost(post:Post) {
-    this.dialogService.openConfirmDialog('Are you sure to delete this record ?')
-    .afterClosed().subscribe((res:boolean) =>{
-      if(res){
-        this.postService.deletePost(post.postId!).subscribe({
-          next: (data) => {
-            this._snackBar.open(data.message, "OK", {
-              duration: 3000,
-              verticalPosition: 'top'
-            })
-            this.getPost(this.postId);
-            this.goToHomePage();
-          },
-          error: (error) => {
-            this._snackBar.open(error.error.errorMessage, "OK", {
-              duration: 3000,
-              verticalPosition: 'top'
-            })
-          }
-        });
-      }
+      error: (error) => this.showMessage(error.error?.errorMessage)
     });
   }
 
-  getFullName(post: Post){
-    this.user = post?.user!;
-    let fullName = this.user?.firstName;
-    if(this.user?.middleName) {
-      fullName+=" "+this.user?.middleName;
-    }
-    if(this.user?.lastName){
-      fullName+=" "+this.user?.lastName;
-    }
-    return fullName;
-  }
-
-  getFullNameUser(user:User){
-    let fullName = this.user?.firstName;
-    if(this.user?.middleName) {
-      fullName+=" "+this.user?.middleName;
-    }
-    if(this.user?.lastName){
-      fullName+=" "+this.user?.lastName;
-    }
-    return fullName;
-  }
-
-  onSubmit(){
-    this.comment = {
-      content: this.addCommentForm.get('content')?.value,
-      post: this.post,
-      user: this.authService.getUserInfo(),
-      userId: this.authService.getUserInfo().userId!,
-      postId: this.postId,
-    }
-    this.addComment(this.comment);
-
-  }
-
-  addComment(comment: Comment) {
-    this.postService.addComment(comment).subscribe({
-      next: (data) => {
-          this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-        this.addCommentForm.reset();
-        this.getPost(this.postId);
-      },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
-    });
+  deleteActivity(activityId: number): void {
     
-  }
-
-  isSameUser(userId:number): boolean {
-    return (this.authService.getUserInfo()?.userId === userId);
-  }
-
-  editComment(comment:Comment){
-    this.isEdit = true;
-    this.editCommentForm.patchValue({
-      content:comment.content
-    });
-    this.commentId = comment.commentId!;
-
-  }
-
-  deleteComment(comment:Comment) {
-    this.dialogService.openConfirmDialog('Are you sure to delete this record ?')
-    .afterClosed().subscribe((res:boolean) =>{
-      if(res){
-        this.postService.deleteComment(comment.commentId!).subscribe({
-          next: (data) => {
-            this._snackBar.open(data.message, "OK", {
-              duration: 3000,
-              verticalPosition: 'top'
-            })
-            this.getPost(this.postId);
-          },
-          error: (error) => {
-            this._snackBar.open(error.error.errorMessage, "OK", {
-              duration: 3000,
-              verticalPosition: 'top'
-            })
-          }
-        });
-      }
+    this.postService.deleteActivity(activityId).subscribe({
+      next: () => {
+        if (this.slug) {
+          this.getPost(this.slug);
+        }
+      },
+      error: (error) => this.showMessage(error.error.errorMessage)
     });
   }
 
-  modifyComment(comment:Comment) {
-    this.updateComment = {
-      content: this.editCommentForm.get('content')?.value,
+  onSubmit(): void {
+    if (this.addCommentForm.invalid) {
+      return;
+    }
+
+    if (!this.post) {
+      this.showMessage("Something went wrong: Missing post information.");
+      return;
+    }
+
+    if (!this.currentUser || !this.currentUser.userId) {
+      this.showMessage("Something went wrong: Missing user information.");
+      return;
+    }
+    
+    const comment: Comment = {
+      content: this.addCommentForm.value.content,
+      post: this.post,
+      user: this.currentUser,
+      userId: this.currentUser.userId,
+      postId: this.post.postId,
+      isEdited: false
+    };
+    this.addComment(comment);
+  }
+
+  editComment(comment: Comment): void {
+    this.editCommentForm.patchValue({ content: comment.content });
+    this.commentId = comment.commentId ?? null;
+    this.ignoreNextClick = true;
+    setTimeout(() => (this.ignoreNextClick = false));
+  }
+
+  modifyComment(comment: Comment): void {
+
+    if (!this.post) {
+      this.showMessage("Something went wrong: Missing post information.");
+      return;
+    }
+
+    if( !comment || ! comment.user || !comment.user.userId) {
+      this.showMessage("Something went wrong: Missing comment information.");
+      return;
+    }
+
+    const updatedComment: Comment = {
+      content: this.editCommentForm.value.content,
       post: this.post,
       user: comment.user,
-      userId: comment.user.userId!,
-      postId: this.post.postId!,
+      userId: comment.user.userId,
+      postId: this.post.postId,
+      isEdited: true
+    };
+
+    if (this.commentId !== null) {
+      this.postService.updateComment(updatedComment, this.commentId).subscribe({
+        next: () => {
+          this.commentId = null;
+          this.getPost(this.slug);
+        },
+        error: (error) => this.showMessage(error.error?.errorMessage)
+      });
     }
-    this.postService.updateComment(this.updateComment,comment.commentId!).subscribe({
-      next: (data) => {
-        this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-        this.isEdit = false;
-        this.editCommentForm.reset();
-        this.getPost(this.postId);
-      },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
+  }
+
+  deleteComment(comment: Comment): void {
+    this.dialogService.openConfirmDialog('Are you sure you want to delete this comment?').afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed && comment.commentId) {
+        this.postService.deleteComment(comment.commentId).subscribe({
+          next: () => {
+            if (this.slug) {
+              this.getPost(this.slug);
+            }
+          },
+          error: (error) => this.showMessage(error.error?.errorMessage)
+        });
       }
     });
+  }
+
+  deletePost(post: Post): void {
+    
+    this.dialogService.openConfirmDialog('Are you sure you want to delete this post?')
+      .afterClosed().subscribe((confirmed: boolean) => {
+        if (confirmed && post.slug) {
+          this.postService.deletePost(post.slug).subscribe({
+            next: (res) => {
+              this.showMessage(res.message);
+              this.goToHomePage();
+            },
+            error: (error) => this.showMessage(error.error?.errorMessage)
+          });
+        }
+      });
+  }
+
+  goToHomePage(): void {
+    this.router.navigate([(this.isSuperAdmin || this.isAdmin) ? '/admin' : '/posts']);
+  }
+
+  editPost(post: Post): void {
+    this.router.navigate([`update-post/${post.slug}`]);
+  }
+
+  getFullName(user: User): string {
+    return [user.firstName, user.middleName, user.lastName].filter(Boolean).join(' ');
+  }
+
+  isPostOwner(userId: number): boolean {
+    return this.currentUser?.userId === userId;
+  }
+
+  isPostPublished(): boolean {
+    return PostStatus.PUBLISHED === this.post?.status;
+  }
+
+  private showMessage(message: string): void {
+    this._snackBar.open(message, 'OK', {
+      duration: 3000,
+      verticalPosition: 'top'
+    });
+  }
+
+  addComment(comment: Comment): void {
+    this.postService.addComment(comment).subscribe({
+      next: () => {
+        this.getPost(this.slug);
+      },
+      error: (error) => this.showMessage(error.error.errorMessage)
+    });
+    this.addCommentForm.reset();
   }
 
   getCommentLikedCount(comment: Comment){
-    return comment.activities!.filter(activity => activity.activityType==="LIKE").length;
+    return (comment.activities || []).filter(activity => activity.activityType==="LIKE").length;
   }
 
   getCommentDisLikedCount(comment: Comment) {
-    return comment.activities!.filter(activity => activity.activityType==="DISLIKE").length;
+    return (comment.activities || []).filter(activity => activity.activityType==="DISLIKE").length;
   }
-
-
 
 }

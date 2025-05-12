@@ -1,5 +1,46 @@
-.center{
+/* .center{
     display:flex;
     justify-content: center;
     align-items: center;
-}
+} */
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 1rem;
+  }
+  
+  .address-card mat-card {
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+  
+  .address-details p {
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .button-group {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+    }
+  }
+  
+  mat-card-content {
+    padding: 1rem 0 !important;
+  }
+  
+  mat-icon {
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+  

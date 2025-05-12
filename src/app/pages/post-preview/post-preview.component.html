@@ -1,68 +1,188 @@
 <div class="container">
-    <a class="link" (click)="goToHomePage()">Home</a> 
-    <div class="card mt-3">
-        <div class="card-header">
-            <p>Posted by <b>{{getFullName(post)}}</b> on <b>{{ post && post!.createdAt | date: 'dd/MM/yyyy'}}</b></p>
-            <p class="text-muted"> Category: {{ post && post.category?.categoryTitle}}</p>
-        </div>
-        <div class="card-body">
-            <p class="fs-3 mt-2 ms-lg-2">{{post && post.postTitle}}</p>
-            <ng-template [ngIf]="post && post.imageUrl">
-                <div class="mt-3">
-                    <img [src]=" post && post.imageUrl" class="card-img-top post-image" alt="Post Image">
-                </div>
-            </ng-template>
-            <p class="card-text mt-3" [innerHTML]="post && post.postContent"></p>
-        </div>
-        <div class="card-footer">
-            <mat-icon class="ms-1" [ngClass]="{'thumb-icon' : postLiked}" (click)="likePost('LIKE','POST',post.postId!)">thumb_up</mat-icon>{{likeCount}}
-            <mat-icon class="ms-3" [ngClass]="{'thumb-icon' : postDisLiked}" (click)="disLikePost('DISLIKE','POST',post.postId!)">thumb_down</mat-icon>{{disLikeCount}}
-            <button *ngIf="isAdmin || isSameUser(post?.user?.userId!)" mat-raised-button color="primary" class="ms-5" (click)="editPost(post)" >Update</button>
-            <button *ngIf="isAdmin && (post?.status !== 'DELETED') || isSameUser(post?.user?.userId!) && (post.status !== 'DELETED')" mat-raised-button color="warn" class="ms-2" (click)="deletePost(post)">Delete</button>
-        </div>
-    </div>
-
-    <ng-template [ngIf] = "post && post.comments!.length>0">
-        <div *ngFor="let comment of post.comments" class="mb-3"> 
-            <div class="card mt-3">
-                <div class="card-header">
-                    <p>Commented by <b>{{getFullNameUser(comment.user)}}</b> on <b>{{comment!.createdAt | date: 'dd/MM/yyyy'}}</b></p>
-                </div>
-                <div class="card-body">
-                    <p *ngIf="!isEdit || (commentId!==comment.commentId)" class="card-text"> {{comment.content}}</p>
-                    <ng-template [ngIf] = "!isEdit && isSameUser(comment.user.userId!)">
-                        <span class="badge bg-primary badgeButton" (click)="editComment(comment)">Edit</span>&nbsp;
-                        <span class="badge bg-danger badgeButton" (click)="deleteComment(comment)">Delete</span>
-                    </ng-template>
-                    <ng-template [ngIf] = "isEdit && (commentId===comment.commentId)">
-                        <form [formGroup] = "editCommentForm" >
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <input type="text" class="form-control" formControlName="content">
-                                </div>
-                                <button mat-raised-button color="primary" [disabled]="!editCommentForm.valid" (click)="modifyComment(comment)">Update</button>
-                            </div>
-                        </form>
-                    </ng-template>
-                </div>
-                <div class="card-footer">
-                    <mat-icon class="ms-1" [ngClass]="{'thumb-icon' : comment.isCommentLiked!}" (click)="likeComment('LIKE','COMMENT',comment)">thumb_up</mat-icon>{{getCommentLikedCount(comment)}}
-                    <mat-icon class="ms-3" [ngClass]="{'thumb-icon' : comment.isCommentDisliked!}" (click)="disLikeComment('DISLIKE','COMMENT',comment)">thumb_down</mat-icon>{{getCommentDisLikedCount(comment)}}        
-                </div>
+    <a class="link" (click)="goToHomePage()">Home</a>  
+    <ng-container *ngIf="post as p">
+        <div class="card mt-3">
+            <div class="card-header">
+                <p class="mb-1">
+                    <strong>{{ getFullName(p?.user!) }}</strong> &bull;
+                    {{ p.createdAt | date: 'mediumDate' }}
+                    <span class="text-muted" *ngIf="p.isEdited">&nbsp;• Edited</span>
+                </p>
+                <p class="text-muted">Category: {{ p.category?.categoryTitle }}</p>
             </div>
-        </div>
-    </ng-template>
-    <div *ngIf = "!isEdit && isLoggedIn" class="card mt-3 mb-3">
-        <div class="card-header">
-          Comments...
-        </div>
-        <form [formGroup] = "addCommentForm" (ngSubmit) = onSubmit()>
+  
             <div class="card-body">
-                <div class="mb-3">
-                    <input type="text" class="form-control" formControlName="content">
-                </div>
-                <button type="submit" mat-raised-button color="primary" [disabled]="!addCommentForm.valid">Submit</button>
+                <h2 class="fs-3 mt-2 ms-lg-2">{{ p.postTitle }}</h2>
+  
+                <ng-container *ngIf="p.imageUrl">
+                    <div class="mt-3">
+                        <img [src]="p.imageUrl" class="card-img-top post-image" alt="Post Image" />
+                    </div>
+                </ng-container>
+  
+                <p class="card-text mt-3" [innerHTML]="p.postContent"></p>
             </div>
-        </form>
-    </div> 
+  
+            <div class="card-footer d-flex align-items-center flex-wrap">
+                <mat-icon
+                    class="ms-1"
+                    [ngClass]="{
+                        'thumb-icon': postLiked,
+                        'disabled-icon': !isPostPublished()
+                      }"
+                    (click)="isPostPublished() && togglePostReaction('LIKE')">
+                    thumb_up
+                </mat-icon>
+                {{ likeCount }}
+  
+                <mat-icon
+                    class="ms-3"
+                    [ngClass]="{
+                        'thumb-icon': postDisLiked,
+                        'disabled-icon': !isPostPublished()
+                      }"
+                    (click)="isPostPublished() && togglePostReaction('DISLIKE')">
+                    thumb_down
+                </mat-icon>
+                {{ disLikeCount }}
+  
+                <button
+                    *ngIf="isSuperAdmin || isAdmin || isPostOwner(p.user?.userId!)"
+                    mat-raised-button
+                    color="primary"
+                    class="ms-5"
+                    (click)="editPost(p)">
+                    Update
+                </button>
+  
+                <button
+                    *ngIf="p.status !== 'DELETED' && (isSuperAdmin || isAdmin || isPostOwner(p.user?.userId!))"
+                    mat-raised-button
+                    color="warn"
+                    class="ms-2"
+                    (click)="deletePost(p)">
+                    Delete
+                </button>
+            </div>
+        </div>
+  
+       
+        <ng-container *ngIf="p.comments && p.comments.length">
+            <div *ngFor="let comment of p.comments" class="mb-3">
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <p>
+                            Commented by <b>{{ getFullName(comment.user) }}</b> on
+                            <b>{{ comment.createdAt | date: 'dd/MM/yyyy' }}</b> &nbsp;
+                            <span *ngIf="comment && comment.isEdited">Edited</span>
+                        </p>
+                    </div>
+  
+                    <div class="card-body">
+                        <div *ngIf="commentId !== comment.commentId">
+                            <p class="card-text">{{ comment.content }}</p>
+  
+                            <ng-container *ngIf="(isSuperAdmin || isAdmin || isPostOwner(comment.user.userId!))">
+                                <span
+                                    class="badge bg-primary badgeButton"
+                                    [ngClass]="{ 'disabled-button': !isPostPublished() }"
+                                    (click)="isPostPublished() && editComment(comment)">
+                                    Edit
+                                </span> 
+                                    &nbsp;
+                                <span
+                                    class="badge bg-danger badgeButton"
+                                    [ngClass]="{ 'disabled-button': !isPostPublished() }"
+                                    (click)="isPostPublished() && deleteComment(comment)">
+                                    Delete
+                                </span>
+                            </ng-container>
+                            <ng-container *ngIf="isLoggedIn && !isSuperAdmin && !isAdmin && !isPostOwner(comment.user.userId!)">
+                                <span
+                                    class="badge bg-danger badgeButton"
+                                    [ngClass]="{ 'disabled-button': !isPostPublished() }"
+                                    (click)="isPostPublished() && deleteComment(comment)">
+                                    Delete
+                                </span>
+                            </ng-container>
+                        </div>
+  
+                        <div *ngIf="commentId === comment.commentId" #commentBox>
+                            <form [formGroup]="editCommentForm">
+                                <div class="mb-2">
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        formControlName="content"
+                                        [disabled]="!isPostPublished()" />
+                                </div>
+                                <button
+                                    mat-raised-button
+                                    color="primary"
+                                    [disabled]="!editCommentForm.valid || !isPostPublished()"
+                                    class="disabled-button"
+                                    [ngClass]="{ 'disabled-button': !isPostPublished() }"
+                                    (click)="isPostPublished() && modifyComment(comment)">
+                                    Update
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+  
+                    <div class="card-footer">
+                        <mat-icon
+                            class="ms-1"
+                            [ngClass]="{ '
+                                thumb-icon': comment.isCommentLiked,
+                                'disabled-icon': !isPostPublished() 
+                                }"
+                            (click)="isPostPublished() && toggleCommentReaction(comment, 'LIKE')">
+                            thumb_up
+                        </mat-icon>
+                        {{ getCommentLikedCount(comment) }}
+                      
+                        <mat-icon
+                            class="ms-3"
+                            [ngClass]="{
+                                'thumb-icon': comment.isCommentDisliked,
+                                'disabled-icon': !isPostPublished()
+                            }"
+                            (click)="isPostPublished() && toggleCommentReaction(comment,'DISLIKE')">
+                        thumb_down
+                    </mat-icon>
+                        {{ getCommentDisLikedCount(comment) }}
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+  
+        
+        <div *ngIf="isLoggedIn" class="card mt-3 mb-3">
+            <div class="card-header">
+                <h5>Leave a comment</h5>
+            </div>
+  
+            <form [formGroup]="addCommentForm" (ngSubmit)="onSubmit()">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            formControlName="content" 
+                            [readonly]="!isPostPublished()"
+                            placeholder="Your comment..." />
+                    </div>
+                    <button
+                        mat-raised-button
+                        color="primary"
+                        (click) = "onSubmit()"
+                        [disabled]="!addCommentForm.valid">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </ng-container>
+      
 </div>
+  

@@ -1,58 +1,85 @@
 <div class="container">
-    <ng-template [ngIf]="posts && posts.content.length>0">
-        <h1 class="text-center">All Posts</h1>
-        <div class="d-flex justify-content-end">
-            <button type="submit" mat-raised-button color="primary" (click)="createPost()" class="ms-5">Create Post</button>
-        </div>
-        
-        <div *ngFor="let post of posts.content">
-            <div class="card mt-3">
-                <div class="card-body">
-                    <div class="main">
-                        <div class="left">
-                            <h1 class="card-title">{{post.postTitle}}</h1>
-                            <p [innerHTML]="(post.postContent.length>50)? (post.postContent | slice:0:50)+'...':(post.postContent)"></p>
-                            <button mat-raised-button color="primary"(click)="readMore(post)" class="ms-2">Read More</button>
-                        </div>
-                        <ng-template [ngIf] = "isAdmin">
-                            <div class="right">
-                                <span class="badge" [ngClass] = "post.status=='APPROVED'? 'bg-success' : post.status=='PENDING' ?'bg-warning':'bg-danger'">{{post.status}} </span>
-                                <button mat-icon-button color="accent" (click)="updatePost(post)">
-                                    <mat-icon>open_in_new</mat-icon>
-                                </button>
-                                <button [disabled]="post.status=='DELETED'" mat-icon-button color="warn" (click)="deletePost(post)">
-                                    <mat-icon>delete</mat-icon>
-                                </button>
-                            </div>
-                        </ng-template>    
-                    </div>
-                    
-                </div>
-            </div>
-        </div> 
-        <div class="d-flex justify-content-center mt-4">
-            <nav *ngIf="posts && posts.content.length > 0" aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item" [ngClass]="posts.isFirst?'disabled':'' ">
-                        <a class="page-link" (click)="onPageChange(posts.pageNumber-1)" aria-label="Previous">
-                            <span aria-hidden="true">&laquo; Previous</span>
-                        </a>
-                    </li>
-                    <li *ngFor="let page of [].constructor(posts.totalPages); index as i" class="page-item">
-                        <a class="page-link" (click)="onPageChange(i)">{{i+1}}</a>
-                    </li>
-                    <li class="page-item" [ngClass]="posts.isLast?'disabled':'' ">
-                        <a class="page-link" (click)="onPageChange(posts.pageNumber+1)" aria-label="Next">
-                            <span aria-hidden="true">Next &raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </ng-template>
-    <div *ngIf="posts && posts.content.length==0">
-        <h1 class="text-center">No Post Found.</h1>
-    </div>
-   
-</div>
+    <!-- Search Form -->
+    <form [formGroup]="searchPostForm" (ngSubmit)="onSubmit()" class="search-form">
+        <div class="form-row">
+            <!-- Search Key -->
+            <mat-form-field appearance="outline">
+                <mat-label>Search by</mat-label>
+                <mat-select formControlName="searchKey">
+                    <mat-option *ngFor="let option of searchList" [value]="option.value">
+                        {{ option.label }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+  
+            <!-- Text Input -->
+            <mat-form-field *ngIf="selectedSearchType === 'text'" appearance="outline" class="search-input">
+                <input matInput placeholder="Search..." formControlName="searchValue">
+                <mat-error *ngIf="searchPostForm.get('searchValue')?.invalid && searchPostForm.get('searchValue')?.touched">
+                    Search value is required
+                </mat-error>
+            </mat-form-field>
+  
+            <!-- Dropdown Input -->
+            <mat-form-field *ngIf="selectedSearchType === 'dropdown'" appearance="outline" class="search-input">
+                <mat-label>Select value</mat-label>
+                <mat-select formControlName="searchValue">
+                    <mat-option *ngFor="let opt of searchOptions" [value]="opt">{{ opt }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="searchPostForm.get('searchValue')?.invalid && searchPostForm.get('searchValue')?.touched">
+                    Search value is required
+                </mat-error>
+            </mat-form-field>
+  
+            <!-- Buttons -->
+            <button mat-flat-button color="primary" type="submit"
+                [disabled]="!searchPostForm.get('searchKey')?.value || !searchPostForm.get('searchValue')?.value?.trim()">
+                <mat-icon>search</mat-icon> Search
+            </button>
 
+            <button mat-icon-button type="button" aria-label="Reset" (click)="onReset()" matTooltip="Reset" matTooltipPosition="above">
+                <mat-icon>refresh</mat-icon>
+            </button>
+        </div>
+    </form>
+  
+    <!-- Header & Create Post Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2 *ngIf="posts.content.length > 0" class="mb-2">All Posts</h2>
+        <button mat-raised-button color="primary" (click)="createPost()">Create Post</button>
+    </div>
+  
+    <!-- Posts -->
+    <div *ngFor="let post of posts.content" class="card mb-4 shadow-sm rounded">
+       <app-post-card [post]="post"></app-post-card>
+    </div>
+  
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="posts?.content?.length">
+        <button mat-button [disabled]="posts.isFirst" (click)="onPageChange(posts.pageNumber - 1)">
+            <mat-icon>chevron_left</mat-icon> Previous
+        </button>
+
+        <ng-container *ngFor="let page of getPageNumbers(); let i = index">
+            <button 
+                mat-stroked-button 
+                color="primary" 
+                [disabled]="i === posts.pageNumber"
+                [ngClass]="{ 'active-page': i === posts.pageNumber }"
+                (click)="onPageChange(i)">
+                {{ i + 1 }}
+            </button>
+        </ng-container>
+
+        <button mat-button [disabled]="posts.isLast" (click)="onPageChange(posts.pageNumber + 1)">
+            Next <mat-icon>chevron_right</mat-icon>
+        </button>
+    </div>
+
+  
+    <!-- No Post Message -->
+    <div *ngIf="posts.content.length === 0" class="text-center mt-5">
+        <h4>No Posts Found.</h4>
+    </div>
+</div>
+  

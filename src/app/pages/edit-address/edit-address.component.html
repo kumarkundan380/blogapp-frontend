@@ -1,66 +1,79 @@
-<div class="container">
-    <h1 class="text-center">Edit Address</h1>
-    <form [formGroup] = "editAddressForm" (ngSubmit) = onSubmit()>
-
-        <div class="row">
-            <div class="col-md-12">
-                <!-- Address Line 1 Field -->
-                <mat-form-field class="w-100" appearance="outline">
-                    <mat-label>Address Line 1</mat-label>
-                    <input matInput placeholder="Enter Here" formControlName = "addressLine1">
-                    <mat-error *ngIf ="editAddressForm.get('addressLine1')?.hasError('required') && editAddressForm.get('addressLine1')?.touched">AddressLine1 is required</mat-error>
-                </mat-form-field>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <!-- Address Line 2 Field -->
-                <mat-form-field class="w-100" appearance="outline">
-                    <mat-label>Address Line 2</mat-label>
-                    <input matInput placeholder="Enter Here" formControlName="addressLine2">
-                </mat-form-field>
-            </div>
-        </div>      
-        <div class="row">
+<div class="container my-4">
+    <h2 class="text-center mb-4">Edit Address</h2>
+  
+    <form [formGroup]="editAddressForm" (ngSubmit)="onSubmit()" class="form-card">
+  
+        <!-- Address Line 1 -->
+        <mat-form-field appearance="outline" class="w-100 mb-3">
+            <mat-label>Address Line 1</mat-label>
+            <input matInput placeholder="Enter here" formControlName="addressLine1">
+            <mat-error *ngIf="editAddressForm.get('addressLine1')?.hasError('required') && editAddressForm.get('addressLine1')?.touched">
+                Address Line 1 is required
+            </mat-error>
+        </mat-form-field>
+  
+        <!-- Address Line 2 -->
+        <mat-form-field appearance="outline" class="w-100 mb-3">
+            <mat-label>Address Line 2</mat-label>
+            <input matInput placeholder="Enter here" formControlName="addressLine2">
+        </mat-form-field>
+  
+        <!-- City & State -->
+        <div class="row g-3">
             <div class="col-md-6">
-                <!-- City Field -->
-                <mat-form-field class="w-100" appearance="outline">
+                <mat-form-field appearance="outline" class="w-100">
                     <mat-label>City</mat-label>
-                    <input matInput placeholder="Enter Here" formControlName="city">
-                    <mat-error *ngIf ="editAddressForm.get('city')?.hasError('required') && editAddressForm.get('city')?.touched">City is required</mat-error>
+                    <input matInput placeholder="Enter here" formControlName="city">
+                    <mat-error *ngIf="editAddressForm.get('city')?.hasError('required') && editAddressForm.get('city')?.touched">
+                        City is required
+                    </mat-error>
                 </mat-form-field>
             </div>
+  
             <div class="col-md-6">
-                <!-- State Field -->
-                <mat-form-field class="w-100" appearance="outline">
+                <mat-form-field appearance="outline" class="w-100">
                     <mat-label>State</mat-label>
-                    <input matInput placeholder="Enter Here" formControlName="state">
-                    <mat-error *ngIf ="editAddressForm.get('state')?.hasError('required') && editAddressForm.get('state')?.touched">State is required</mat-error>
+                    <input matInput placeholder="Enter here" formControlName="state">
+                    <mat-error *ngIf="editAddressForm.get('state')?.hasError('required') && editAddressForm.get('state')?.touched">
+                        State is required
+                    </mat-error>
                 </mat-form-field>
             </div>
         </div>
-        <div class="row">
+  
+        <!-- Country & Postal Code -->
+        <div class="row g-3">
             <div class="col-md-6">
-                <!-- City Field -->
-                <mat-form-field class="w-100" appearance="outline">
+                <mat-form-field appearance="outline" class="w-100">
                     <mat-label>Country</mat-label>
-                    <input matInput placeholder="Enter Here" formControlName="country">
-                    <mat-error *ngIf ="editAddressForm.get('country')?.hasError('required') && editAddressForm.get('country')?.touched">Country is required</mat-error>
+                    <input matInput placeholder="Enter here" formControlName="country">
+                    <mat-error *ngIf="editAddressForm.get('country')?.hasError('required') && editAddressForm.get('country')?.touched">
+                        Country is required
+                    </mat-error>
                 </mat-form-field>
             </div>
-
+  
             <div class="col-md-6">
-                <!-- Postal code Field -->
-                <mat-form-field class="w-100" appearance="outline">
-                    <mat-label>Postal Code</mat-label>
-                    <input matInput placeholder="Enter Here" formControlName="postalCode">
-                    <mat-error *ngIf ="editAddressForm.get('postalCode')?.hasError('required') && editAddressForm.get('postalCode')?.touched">Postal Code is required</mat-error>
+                <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Pin Code</mat-label>
+                    <input matInput placeholder="Enter here" formControlName="postalCode">
+                    <mat-error *ngIf="editAddressForm.get('postalCode')?.hasError('required') && editAddressForm.get('postalCode')?.touched">
+                        Pin Code is required
+                    </mat-error>
                 </mat-form-field>
             </div>
-        </div> 
-        <div class="d-flex justify-content-center">
-            <button type="submit" mat-raised-button color="primary" [disabled]="!editAddressForm.valid">Submit</button>
-            <button type="reset" mat-raised-button color="accent" class="ms-2">Reset</button>
-        </div>  
+        </div>
+  
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-center mt-4 flex-wrap gap-2">
+            <button mat-flat-button color="primary" type="submit" [disabled]="editAddressForm.invalid || !formChanged">
+                <mat-icon>check_circle</mat-icon> Submit
+            </button>
+            <button mat-flat-button color="accent" (click)="resetForm()" [disabled]="!formChanged">
+                <mat-icon>refresh</mat-icon> Reset
+            </button>
+        </div>
+  
     </form>
 </div>
+  

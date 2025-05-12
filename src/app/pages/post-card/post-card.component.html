@@ -1,0 +1,38 @@
+<div class="container">
+    <div class="card-body">
+        <div class="row">
+            <div [ngClass]="(isSuperAdmin || isAdmin)? 'col-md-9' : 'col-12'">
+                <h4 class="card-title title-with-views">
+                    {{ post.postTitle }}
+                    <span class="view-count">
+                      <mat-icon class="view-icon">visibility</mat-icon>
+                      {{ post.viewCount }} views
+                    </span>
+                </h4>
+                <p class="card-text text-muted" [innerHTML]="(post.postContent | stripHtml).length > 200 
+                    ? (post.postContent | stripHtml | slice: 0: 200) + '...' 
+                    : (post.postContent | stripHtml)">
+                </p>
+                <button mat-button color="primary" (click)="readMore(post)">Read More</button>
+            </div>
+            <div *ngIf="isSuperAdmin || isAdmin" class="col-md-3 text-end">
+                <span class="badge rounded-pill px-3 py-2 fs-6"
+                    [ngClass]="{
+                        'bg-success': post.status === 'PUBLISHED',
+                        'bg-warning': post.status === 'PENDING',
+                        'bg-danger': post.status === 'DELETED'
+                    }">
+                    {{ post.status }}
+                </span>
+                <div class="mt-3">
+                    <button mat-icon-button color="accent" (click)="updatePost(post)" matTooltip="Edit" matTooltipPosition="above">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deletePost(post)" [disabled]="post.status === 'DELETED'" matTooltip="Delete" matTooltipPosition="above">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    

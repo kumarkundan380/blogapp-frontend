@@ -1,8 +1,14 @@
-<div class="container">
-    <h1 class="text-center mt-5 mb-5">Verify Your Email Id.</h1>
-    <div class="d-flex justify-content-center">
-        
-        <button type="button" mat-raised-button color="primary" (click)="emailVerify()" >Verify</button>
-    </div>
-
+<div class="container d-flex flex-column align-items-center justify-content-center vh-100">
+    <h1 class="text-center mb-4">Verify Your Email</h1>
+  
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="emailVerify()" 
+      aria-label="Verify Email"
+      class="btn-lg"
+    >
+      Verify Email
+    </button>
 </div>
+  

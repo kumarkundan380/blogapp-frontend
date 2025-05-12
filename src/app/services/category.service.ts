@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BlogappResponse } from '../model/blogapp-response';
+import { environment } from 'src/environments/environment';
+import { BlogAppResponse } from '../model/blogapp-response';
 import { Category } from '../model/category';
 
 @Injectable({
@@ -9,28 +10,28 @@ import { Category } from '../model/category';
 })
 export class CategoryService {
 
-  private BASE_URL = "http://localhost:8080/api/v1/categories";
+  private readonly BASE_URL = `${environment.apiBaseUrl}/categories`; 
 
   constructor(private httpClient : HttpClient) { }
 
-  addCategory(category: Category): Observable<BlogappResponse<Category>> {
-    return this.httpClient.post<BlogappResponse<Category>>(`${this.BASE_URL}`, category);
+  addCategory(category: Category): Observable<BlogAppResponse<Category>> {
+    return this.httpClient.post<BlogAppResponse<Category>>(`${this.BASE_URL}`, category);
   }
 
-  updateCategory(category: Category,categoryId:number): Observable<BlogappResponse<Category>> {
-    return this.httpClient.put<BlogappResponse<Category>>(`${this.BASE_URL}/${categoryId}`, category);
+  updateCategory(category: Category,categoryId:number): Observable<BlogAppResponse<Category>> {
+    return this.httpClient.put<BlogAppResponse<Category>>(`${this.BASE_URL}/${categoryId}`, category);
   }
 
-  getCategory(categoryId : number): Observable<BlogappResponse<Category>> {
-    return this.httpClient.get<BlogappResponse<Category>>(`${this.BASE_URL}/${categoryId}`);
+  getCategory(categoryId : number): Observable<BlogAppResponse<Category>> {
+    return this.httpClient.get<BlogAppResponse<Category>>(`${this.BASE_URL}/${categoryId}`);
   }
 
-  getAllCategory(): Observable<BlogappResponse<Category[]>>{
-    return this.httpClient.get<BlogappResponse<Category[]>>(`${this.BASE_URL}`);
+  getAllCategory(): Observable<BlogAppResponse<Category[]>>{
+    return this.httpClient.get<BlogAppResponse<Category[]>>(`${this.BASE_URL}`);
   }
 
-  deleteCategory(categoryId : number): Observable<BlogappResponse<Category>> {
-    return this.httpClient.delete<BlogappResponse<Category>>(`${this.BASE_URL}/${categoryId}`);
+  deleteCategory(categoryId : number): Observable<BlogAppResponse<Category>> {
+    return this.httpClient.delete<BlogAppResponse<Category>>(`${this.BASE_URL}/${categoryId}`);
   }
 
 }

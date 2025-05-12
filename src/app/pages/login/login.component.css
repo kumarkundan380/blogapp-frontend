@@ -1,9 +1,80 @@
-.image-container {
-    height: 200px;
-    width: 200px;
- }
-.link {
-    color: blue;
-    text-decoration: underline !important;
-    cursor: pointer;
+
+/* Center the entire login card vertically and horizontally */
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f7f9fc;
+    padding: 20px;
 }
+
+/* Card Styling */
+.col-md-6 {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo Styling */
+.image-container {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Link Styling */
+.link {
+    color: #007BFF;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* Button spacing */
+button[type="submit"],
+button[type="reset"] {
+    min-width: 100px;
+}
+
+.mat-icon-large {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .col-md-6 {
+        padding: 20px;
+    }
+
+    .image-container {
+        width: 80px;
+        height: 80px;
+    }
+
+    .link {
+        font-size: 0.9rem;
+    }
+    .mat-icon-large {
+        font-size: 30px;  /* Adjust size on smaller screens */
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mat-icon-large {
+      font-size: 24px;  /* Further reduce size on extra small screens */
+      width: 24px;
+      height: 24px;
+    }
+}
+

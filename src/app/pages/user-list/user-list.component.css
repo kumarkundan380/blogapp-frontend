@@ -1,6 +1,141 @@
+.user-list-container {
+  padding: 1rem;
+  max-width: 100%;
+}
+  
+/* Search Form Styling */
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+  
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+  
+.search-input {
+  min-width: 200px;
+  flex-grow: 1;
+}
+  
+/* Table Styling */
 table {
+  width: 100%;
+  border-collapse: collapse;
+}
+  
+th, td {
+  text-align: center;
+  white-space: nowrap;
+  padding: 0.75rem;
+}
+  
+.badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+  
+.bg-success {
+  background-color: #4caf50;
+  color: white;
+}
+  
+.bg-danger {
+  background-color: #f44336;
+  color: white;
+}
+  
+.bg-warning {
+  background-color: #ffc107;
+  color: white;
+}
+  
+.text-dark {
+  color: #000 !important;
+}
+  
+/* Pagination */
+.pagination-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+/* Highlight current active page button */
+button.active-page {
+  background-color: #ff4081;
+  color: white;
+  font-weight: bold;
+}
+
+/* Action buttons layout */
+.action-buttons {
+  display: flex;
+/* Adjust the space between buttons */
+  justify-content: center;
+  align-items: center;
+}
+  
+  
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-form {
+    justify-content: center;
+  }
+  
+  table thead {
+    display: none;
+  }
+  
+  table, tbody, tr, td {
+    display: block;
     width: 100%;
+  }
+  
+  tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  td {
+    text-align: left;
+    position: relative;
+    padding-left: 50%;
+  }
+  
+  td::before {
+    position: absolute;
+    left: 1rem;
+    top: 0.75rem;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  
+  td:nth-of-type(1)::before { content: "User ID"; }
+  td:nth-of-type(2)::before { content: "Username"; }
+  td:nth-of-type(3)::before { content: "Name"; }
+  td:nth-of-type(4)::before { content: "Email"; }
+  /* td:nth-of-type(5)::before { content: "Gender"; } */
+  td:nth-of-type(5)::before { content: "Email Verified"; }
+  td:nth-of-type(6)::before { content: "Status"; }
+  td:nth-of-type(7)::before { content: "Action"; }
 }
-th,td {
-    text-align: center;
-}
+  

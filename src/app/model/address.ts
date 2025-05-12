@@ -1,11 +1,12 @@
 export interface Address {
 
-    addressId?:number;
-    addressLine1:string;
-    addressLine2:string;
-    city:string;
-    state:string;
-    country:string;
-    postalCode:string
+    readonly addressId?: number;  // ID should be immutable
+    addressLine1: string;
+    addressLine2?: string;  // Optional (backend allows null)
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+    version?: number;
     
 }

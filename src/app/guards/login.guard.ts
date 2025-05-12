@@ -9,16 +9,11 @@ import { AuthService } from '../services/auth.service';
 export class LoginGuard {
   
   constructor(private authService: AuthService, private router: Router) { }
-  canActivate():
-    | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree>
-    | boolean
-    | UrlTree {
-      if (this.authService.isLoggedIn()) {
-        return true;
-      }
-      this.router.navigate(['\login']);
-      return false;
+  
+  canActivate(): boolean | UrlTree {
+    return this.authService.isLoggedIn() 
+      ? true 
+      : this.router.createUrlTree(['/login']);
   }
   
 }

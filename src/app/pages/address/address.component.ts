@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Address } from 'src/app/model/address';
+import { AuthService } from 'src/app/services/auth.service';
 import { DialogService } from 'src/app/services/dialog.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -13,20 +14,26 @@ import { UserService } from 'src/app/services/user.service';
 })
 export class AddressComponent implements OnInit {
 
-  addressess!: Address[];
+  addressess: Address[] = [];
   userId!: number;
   dialogSubscription!: Subscription;
+  isSuperAdmin: boolean = false;
+  isAdmin: boolean = false;
 
   constructor(private userService : UserService, 
     private activateRoute: ActivatedRoute,
     private router: Router,
     private _snackBar: MatSnackBar,
-    private dialogService: DialogService){
+    private dialogService: DialogService,
+    private authService: AuthService){
   }
 
   ngOnInit(): void {
     this.userId = this.activateRoute.snapshot.params['userId'];
     this.getAllAddress();
+    const userInfo = this.authService.getUserInfo()!;
+    this.isSuperAdmin = this.authService.isSuperAdminUser(userInfo);
+    this.isAdmin = this.authService.isAdminUser(userInfo);
   }
 
   getAllAddress(){
@@ -35,7 +42,7 @@ export class AddressComponent implements OnInit {
         this.addressess = data.body
       },
       error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
+        this._snackBar.open(error.error?.errorMessage, "OK", {
           duration: 3000,
           verticalPosition: 'top'
         })
@@ -68,11 +75,20 @@ export class AddressComponent implements OnInit {
   }
 
   addAddress(){
-    this.router.navigate([`/add-address/${this.userId}`]);
+
+    if(this.isSuperAdmin || this.isAdmin) {
+      this.router.navigate([`/admin/add-address/${this.userId}`]);
+    } else {
+      this.router.navigate([`/add-address/${this.userId}`]);
+    }  
   }
 
   editAddress(addressId:number){
-    this.router.navigate([`/address/${this.userId}/${addressId}`]);
+    if(this.isSuperAdmin || this.isAdmin) {
+      this.router.navigate([`/admin/edit-address/${this.userId}/${addressId}`]);
+    } else {
+      this.router.navigate([`/edit-address/${this.userId}/${addressId}`]);
+    }  
   }
 
 

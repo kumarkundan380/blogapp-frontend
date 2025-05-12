@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Address } from 'src/app/model/address';
 import { User } from 'src/app/model/user';
+import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 
 @Component({
@@ -14,60 +15,73 @@ import { UserService } from 'src/app/services/user.service';
 export class AddAddressComponent implements OnInit{
 
   addAddressForm!: FormGroup;
-  user!: User;
-  address!: Address;
-  userId!:number;
+  userId!: number;
+  isSuperAdmin = false;
+  isAdmin = false;
 
-  constructor(private userService : UserService, 
-    private activateRoute: ActivatedRoute,
+  constructor(
+    private userService: UserService,
+    private route: ActivatedRoute,
     private router: Router,
-    private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar){
-    
-  }
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.userId = this.activateRoute.snapshot.params['userId'];
-    this.addAddressForm = this.formBuilder.group({
-      addressLine1: new FormControl('',Validators.required),
-	    addressLine2: new FormControl(''),
-	    city: new FormControl('', Validators.required),
-	    state: new FormControl('', Validators.required),
-	    country: new FormControl('',Validators.required),
-	    postalCode: new FormControl('',Validators.required),
+    this.userId = +this.route.snapshot.params['userId'];
+    this.initializeForm();
+    this.initializeRoles();
+  }
+
+  private initializeForm(): void {
+    this.addAddressForm = this.fb.group({
+      addressLine1: ['', Validators.required],
+      addressLine2: [''],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      country: ['', Validators.required],
+      postalCode: ['', Validators.required]
     });
   }
 
-  onSubmit(){
-    this.address = {
-      addressLine1:this.addAddressForm.get('addressLine1')?.value,
-      addressLine2:this.addAddressForm.get('addressLine2')?.value,
-      city:this.addAddressForm.get('city')?.value,
-      state:this.addAddressForm.get('state')?.value,
-      country:this.addAddressForm.get('country')?.value,
-      postalCode:this.addAddressForm.get('postalCode')?.value,
+  private initializeRoles(): void {
+    const userInfo = this.authService.getUserInfo();
+    if (userInfo) {
+      this.isSuperAdmin = this.authService.isSuperAdminUser(userInfo);
+      this.isAdmin = this.authService.isAdminUser(userInfo);
     }
-    this.addAddress(this.userId);
   }
 
-  addAddress(userId:number){
-    this.userService.addAddress(this.address,userId).subscribe({
-      next: (data) => {
-          this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
+  onSubmit(): void {
+    if (this.addAddressForm.invalid) return;
+
+    const address: Address = this.addAddressForm.value;
+
+    this.userService.addAddress(address, this.userId).subscribe({
+      next: (response) => {
+        this.showMessage(response.message);
         this.addAddressForm.reset();
-        this.router.navigate([`all-address/${userId}`])
+        this.navigateToAllAddresses();
       },
       error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
+        this.showMessage(error.error.errorMessage);
       }
     });
   }
 
+  private showMessage(message: string): void {
+    this.snackBar.open(message, 'OK', {
+      duration: 3000,
+      verticalPosition: 'top'
+    });
+  }
+
+  private navigateToAllAddresses(): void {
+    const routePath = this.isSuperAdmin || this.isAdmin
+      ? `/admin/all-address/${this.userId}`
+      : `/all-address/${this.userId}`;
+    this.router.navigate([routePath]);
+  }
 
 }

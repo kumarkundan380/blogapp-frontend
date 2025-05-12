@@ -1,9 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { LoginRequest } from 'src/app/model/login-request';
 import { AuthService } from 'src/app/services/auth.service';
+
+declare var grecaptcha: any; // Declare reCAPTCHA globall
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
 
 @Component({
   selector: 'app-login',
@@ -13,81 +21,118 @@ import { AuthService } from 'src/app/services/auth.service';
 export class LoginComponent implements OnInit, OnDestroy {
 
   logInForm!: FormGroup;
-  loginRequest!: LoginRequest;
-  isLoggedIn!: boolean;
-  profileImage!: string;
-  hide=true;
+  hide: boolean = true;
+  captchaError: boolean = false;
+  captchaToken: string | null = null;
+  profileImage: string = "../../../assets/profile.png";
+  private subscriptions: Subscription = new Subscription();
+
 
   constructor(private authService : AuthService, 
     private router: Router,
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar){
+    private snackBar: MatSnackBar){
     
   }
 
   ngOnInit(): void {
+
     this.authService.showLoginButtonSubject.next(false);
     this.authService.showSignupButtonSubject.next(true);
-    this.profileImage = "../../../assets/profile.png";
-    this.logInForm = this.formBuilder.group({
-      userName: new FormControl('', Validators.required),
-	    password: new FormControl('', Validators.required),
-    });
-  }
+    this.initializeForm();
 
-  onSubmit(){
-    this.loginRequest = {
-      userName:this.logInForm.get('userName')?.value,
-      password:this.logInForm.get('password')?.value
-    }
-    this.logIn();
-  }
-
-  logIn(){
-    this.authService.loginUser(this.loginRequest).subscribe({
-      next: (data) => {
-        this.authService.setUserInfo(data.body);
-        this.authService.logInStatusSubject.next(true);
-        if(data.body.user.userImage){
-          this.authService.profileImageSubject.next(data.body.user.userImage);
-        } 
-        this._snackBar.open(data.message, "OK", {
-        duration: 3000,
-        verticalPosition: 'top'
-      })
-      this.logInForm.reset();
-      if(this.authService.isAdminUser(data.body.user)) {
-        this.router.navigate(['/admin']);
-      } else {
-        this.router.navigate(['/']);
+    // Ensure reCAPTCHA is rendered correctly
+    const checkRecaptcha = setInterval(() => {
+      if (window['grecaptcha'] && window['grecaptcha'].render) {
+        clearInterval(checkRecaptcha);
+        grecaptcha.render('recaptcha-container', {
+          sitekey: '6LcKFiQpAAAAAEsj9QIGJdQLWwC4fNUv2gPnWlUF',
+          callback: (response: string) => this.onCaptchaResolved(response)
+        });
       }
-    },
-      error: (error) => {
-        this.authService.logInStatusSubject.next(false);
-        this._snackBar.open(error?.error?.errorMessage, "OK", {
-        duration: 3000,
-        verticalPosition: 'top'
-      })
-    }      
-    }); 
+    }, 200); 
   }
 
-  resetForm(){
+  // Callback for reCAPTCHA
+  onCaptchaResolved(token: string) {
+    this.captchaToken = token;
+    this.captchaError = false;
+  }
+
+  private initializeForm(): void {
+    
     this.logInForm = this.formBuilder.group({
-      userName: new FormControl('', Validators.required),
-	    password: new FormControl('', Validators.required),
+      userName: ['', Validators.required],
+      password: ['', Validators.required]
     });
   }
 
-  frogotPassword() {
-    this.router.navigate(['/forgot-password'])
+  onSubmit(): void {
+    
+    if (this.logInForm.invalid) return;
+
+    if (!this.captchaToken) {
+      this.captchaError = true;
+      this.showSnackBar('Please verify reCAPTCHA');
+      return;
+    }
+
+    const loginRequestData: LoginRequest = {
+      userName: this.logInForm.value.userName,
+      password: this.logInForm.value.password,
+      securityToken: this.captchaToken // Sending captcha token
+    };
+
+    this.subscriptions.add(
+      this.authService.loginUser(loginRequestData).subscribe({
+        next: (response) => {
+          this.authService.setUserInfo(response.body);
+          this.authService.logInStatusSubject.next(true);
+
+          if (response.body.user.userImage) {
+            this.authService.profileImageSubject.next(response.body.user.userImage);
+          }
+
+          this.showSnackBar(response.message);
+          this.logInForm.reset();
+          const isSuperAdmin = this.authService.isSuperAdminUser(response.body.user);
+          const isAdmin = this.authService.isAdminUser(response.body.user);
+          const redirectRoute = (isSuperAdmin || isAdmin) ? '/admin' : '/posts';
+          this.router.navigate([redirectRoute]);
+        },
+        error: (error) => {
+          this.authService.logInStatusSubject.next(false);
+          this.showSnackBar(error?.error?.message);
+          this.resetCaptcha();
+        }
+      })
+    );
   }
 
-  
+  resetForm(): void {
+    this.logInForm.reset();
+    this.resetCaptcha();
+  }
+
+  private resetCaptcha(): void {
+    this.captchaToken = null;
+    grecaptcha.reset(); // Reset reCAPTCHA
+  }
+
+  forgotPassword(): void {
+    this.router.navigate(['/forgot-password']);
+  }
+
+  private showSnackBar(message: string): void {
+    this.snackBar.open(message, "OK", {
+      duration: 3000,
+      verticalPosition: 'top'
+    });
+  }
 
   ngOnDestroy(): void {
     this.authService.showLoginButtonSubject.next(true);
+    this.subscriptions.unsubscribe(); // Prevent memory leaks
   }
-
 
 }

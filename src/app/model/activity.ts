@@ -11,5 +11,6 @@ export interface Activity {
     userId: number;
     createdAt?: string;
     updatedAt?: string;
+    version?: number;
 
 }

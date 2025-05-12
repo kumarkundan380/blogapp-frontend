@@ -1,50 +1,65 @@
 <div class="container">
-    <p class="text-center fs-3"> Register Here</p>
-    <div class="row mt-2">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-center circle">
-                <img [src]="imageSrc" alt="Selected Image" class="rounded-circle image-container">
+    <div class="row w-100">
+        <div class="col-md-10 offset-md-1 signup-card">
+  
+            <!-- Title Section -->
+            <div class="text-center mb-4">
+                <mat-icon color="primary" class="mat-icon-large">person_add</mat-icon>
+                <h2 class="mt-2">Register Yourself</h2>
+                <p class="text-muted">Create an account to continue</p>
             </div>
-
-            <div class="d-flex justify-content-center mt-3 mb-5">
-                <input type="file" class="file-input"
-                (change)="onFileSelected($event)">
+  
+            <!-- Profile Picture Section -->
+            <div class="text-center mb-3">
+                <label for="fileInput" class="circle">
+                    <img [src]="imageSrc" alt="Profile Picture" class="rounded-circle image-container">
+                </label> 
             </div>
-           
-            <form [formGroup] = "signUpForm" (ngSubmit) = onSubmit()>
+            <!-- File Upload -->
+            <div class="file-upload-wrapper mt-3 mb-4">
+                <label class="custom-file-label">
+                    <input type="file" (change)="onFileSelected($event)" />
+                    {{ selectedFileName || 'Upload Profile Image' }}
+                </label>
+            </div>
+  
+            <!-- Signup Form -->
+            <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" novalidate>
+  
+            <!-- Your existing form fields stay the same... -->
 
                 <div class="row">
                     <div class="col-md-6">
                         <!-- Username Field -->
                         <mat-form-field class="w-100" appearance="outline">
                             <mat-label>Username</mat-label>
-                            <input matInput placeholder="Enter Here" formControlName = "userName">
-                            <mat-error *ngIf ="signUpForm.get('userName')?.hasError('required') && signUpForm.get('userName')?.touched">Username is required</mat-error>
-                            <mat-error *ngIf ="signUpForm.get('userName')?.hasError('email') && signUpForm.get('userName')?.touched">Email is not valid</mat-error>
+                            <input matInput placeholder="Enter Here" formControlName="userName">
+                            <mat-error *ngIf="signUpForm.get('userName')?.hasError('required')">Username is required</mat-error>
                         </mat-form-field>
                     </div>
 
                     <div class="col-md-6">
-                       <!-- Password Field -->
+                        <!-- Password Field -->
                         <mat-form-field class="w-100" appearance="outline">
                             <mat-label>Password</mat-label>
-                            <input matInput [type]="hide ? 'password' : 'text'" placeholder="Enter Here" formControlName="password">
-                            <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
-                                <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="Enter Here" formControlName="password">
+                            <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" aria-label="Toggle password visibility">
+                                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                             </button>
-                            <mat-error *ngIf ="signUpForm.get('password')?.hasError('required') && signUpForm.get('password')?.touched">Password is required</mat-error>
-                            <mat-error *ngIf ="signUpForm.get('password')?.hasError('minlength') && signUpForm.get('password')?.touched">Password should have Minimum 4 Characters </mat-error>
-                            <mat-error *ngIf ="signUpForm.get('password')?.hasError('maxlength') && signUpForm.get('password')?.touched">Password should have Maximum 10 Characters</mat-error>
+                            <mat-error *ngIf="signUpForm.get('password')?.hasError('required')">Password is required</mat-error>
+                            <mat-error *ngIf="signUpForm.get('password')?.hasError('minlength')">Minimum 4 characters</mat-error>
+                            <mat-error *ngIf="signUpForm.get('password')?.hasError('maxlength')">Maximum 10 characters</mat-error>
                         </mat-form-field>
                     </div>
-                </div>    
+                </div>
+
                 <div class="row">
                     <div class="col-md-4">
                         <!-- First Name Field -->
                         <mat-form-field class="w-100" appearance="outline">
                             <mat-label>First Name</mat-label>
                             <input matInput placeholder="Enter Here" formControlName="firstName">
-                            <mat-error *ngIf ="signUpForm.get('firstName')?.hasError('required') && signUpForm.get('firstName')?.touched">First Name is required</mat-error>
+                            <mat-error *ngIf="signUpForm.get('firstName')?.hasError('required')">First Name is required</mat-error>
                         </mat-form-field>
                     </div>
                     <div class="col-md-4">
@@ -62,42 +77,157 @@
                         </mat-form-field>
                     </div>
                 </div>
+
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <!-- Email -->
+                        <mat-form-field class="w-100" appearance="outline">
+                            <mat-label>Email Id</mat-label>
+                            <input matInput type="email" placeholder="Enter Email" formControlName="email">
+                            <mat-error *ngIf="signUpForm.get('email')?.hasError('required')">Email is required</mat-error>
+                            <mat-error *ngIf="signUpForm.get('email')?.hasError('email')">Invalid Email</mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-4">
                         <!-- Phone Field -->
                         <mat-form-field class="w-100" appearance="outline">
                             <mat-label>Phone Number</mat-label>
                             <input matInput placeholder="Enter Here" formControlName="phoneNumber">
                         </mat-form-field>
                     </div>
-                    <div class="col-md-6">
-                        <!-- Gender Field-->
-                        <mat-form-field class="w-100" appearance="outline"> 
-                            <mat-label>Select Gender</mat-label>
+                    <div class="col-md-4">
+                        <!-- Gender Field -->
+                        <mat-form-field class="w-100" appearance="outline">
+                            <mat-label>Gender</mat-label>
                             <mat-select formControlName="gender">
-                                <mat-option value="MALE">MALE</mat-option>
-                                <mat-option value="FEMALE">FEMALE</mat-option>
-                                <mat-option value="OTHERS">OTHERS</mat-option>
+                                <mat-option *ngFor="let gender of genders" [value]="gender">{{ gender }}</mat-option>
                             </mat-select>
-                            <mat-error *ngIf ="signUpForm.get('gender')?.hasError('required') && signUpForm.get('gender')?.touched"> Gender is required</mat-error>
+                            <mat-error *ngIf="signUpForm.get('gender')?.hasError('required')">Gender is required</mat-error>
                         </mat-form-field>
                     </div>
                 </div>
+                <div formArrayName="addresses">
+                    <div *ngFor="let addressGroup of addresses.controls; let i = index" [formGroupName]="i">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Address Line 1 Field -->
+                                <mat-form-field class="w-100" appearance="outline">
+                                    <mat-label>
+                                        Address Line 1 
+                                        <span *ngIf="hasStartedFillingAddress(addressGroup)" class="astrix">*</span>
+                                    </mat-label>
+                                    <input matInput type="text" placeholder="Enter Address Line 1" formControlName="addressLine1">
+                                    <mat-error *ngIf="addressGroup.get('addressLine1')?.hasError('required') && (addressGroup.get('addressLine1')?.dirty || addressGroup.get('addressLine1')?.touched)">
+                                        Address Line 1 is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Address Line 2 Field -->
+                                <mat-form-field class="w-100" appearance="outline">
+                                    <mat-label>Address Line 2</mat-label>
+                                    <input matInput placeholder="Enter Address Line 2" formControlName="addressLine2">
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- City Field -->
+                                <mat-form-field class="w-100" appearance="outline">
+                                    <mat-label>
+                                        City 
+                                        <span *ngIf="hasStartedFillingAddress(addressGroup)" class="astrix">*</span>
+                                    </mat-label>
+                                    <input matInput type="text" placeholder="Enter City" formControlName="city">
+                                    <mat-error *ngIf="addressGroup.get('city')?.hasError('required') && (addressGroup.get('city')?.dirty || addressGroup.get('city')?.touched)">
+                                        City is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- State Field -->
+                                <mat-form-field class="w-100" appearance="outline">
+                                    <mat-label>
+                                        State 
+                                        <span *ngIf="hasStartedFillingAddress(addressGroup)" class="astrix">*</span>
+                                    </mat-label>
+                                    <input matInput placeholder="Enter State" formControlName="state">
+                                    <mat-error *ngIf="addressGroup.get('state')?.hasError('required') && (addressGroup.get('state')?.dirty || addressGroup.get('state')?.touched)">
+                                        State is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Country Field -->
+                                <mat-form-field class="w-100" appearance="outline">
+                                    <mat-label>
+                                        Country 
+                                        <span *ngIf="hasStartedFillingAddress(addressGroup)" class="astrix">*</span>
+                                    </mat-label>
+                                    <input matInput type="text" placeholder="Enter Country" formControlName="country">
+                                    <mat-error *ngIf="addressGroup.get('country')?.hasError('required') && (addressGroup.get('country')?.dirty || addressGroup.get('country')?.touched)">
+                                        Country is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Pin Code Field -->
+                                <mat-form-field class="w-100" appearance="outline">
+                                    <mat-label>
+                                        Pin Code 
+                                        <span *ngIf="hasStartedFillingAddress(addressGroup)" class="astrix">*</span>
+                                    </mat-label>
+                                    <input matInput placeholder="Enter Pin Code" formControlName="postalCode">
+                                    <mat-error *ngIf="addressGroup.get('postalCode')?.hasError('required') && (addressGroup.get('postalCode')?.dirty || addressGroup.get('postalCode')?.touched)">
+                                        Pin Code is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" mat-icon-button color="warn" (click)="removeAddress(i)" *ngIf="addresses.length > 1">
+                                <mat-icon>remove_circle</mat-icon>
+                            </button>
+                        </div>
+                        <hr>
+                    </div>  
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="button" mat-raised-button color="primary" (click)="addAddress()">Add Address</button>
+                    </div>
+                </div>    
+        
                 <div class="row">
                     <div class="col-md-12">
+                        <!-- About Field -->
                         <mat-form-field class="w-100" appearance="outline">
                             <mat-label>About</mat-label>
                             <textarea matInput placeholder="Enter Here" formControlName="about"></textarea>
-                        </mat-form-field>    
+                        </mat-form-field>
                     </div>
                 </div>
-
-                <div class="d-flex justify-content-center">
-                    <button type="submit" mat-raised-button color="primary" [disabled]="!signUpForm.valid">Register</button>
-                    <button type="reset" mat-raised-button color="accent" class="ms-2">Reset</button>
-                </div>  
+                <!-- Submit Buttons -->
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" mat-raised-button color="primary" [disabled]="!signUpForm.valid">
+                        <mat-icon>check_circle</mat-icon>
+                        Register
+                    </button>
+                    <button type="reset" mat-raised-button color="accent" class="ms-2" (click)="resetForm()" [disabled]="!isDirty">
+                        <mat-icon>refresh</mat-icon>
+                        Reset
+                    </button>
+                </div>
+  
+                <!-- Already have an account -->
+                <div class="text-center mt-4">
+                    <span class="text-muted">Already have an account? <a class="link" routerLink="/login">Login here</a></span>
+                </div>
+  
             </form>
-
         </div>
     </div>
 </div>
+  

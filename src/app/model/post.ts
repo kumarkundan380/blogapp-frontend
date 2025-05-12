@@ -15,7 +15,18 @@ export interface Post {
     activities?:Activity[];
     userId?:number;
     categoryId:number;
-    status?:string;
+    status?:PostStatus;
     createdAt?:string;
     updatedAt?:string;
+    version?: number;
+    isEdited: boolean;
+    viewCount?: number;
+    slug?: string;
+}
+
+export enum PostStatus {
+    
+    PUBLISHED = "PUBLISHED",
+    PENDING = "PENDING",
+    DELETED ="DELETED"
 }

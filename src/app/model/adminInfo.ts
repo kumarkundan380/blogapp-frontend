@@ -1,14 +1,16 @@
 export interface AdminInfo {
-    numberOfUser: number;
-    numberOfActiveUser: number;
-    numberOfPendingUser: number;
-    numberOfDeletedUser: number;
-    numberOfPost: number;
-    numberOfActivePost: number;
-    numberOfPendingPost: number;
-    numberOfDeletedPost: number;
-    numberOfCategory: number;
-    numberOfActiveCategory: number;
-    numberOfPendingCategory: number;
-    numberOfDeletedCategory: number;
+    
+    numberOfUsers: number;
+    numberOfActiveUsers: number;
+    numberOfPendingUsers: number;
+    numberOfDeletedUsers: number;
+    numberOfPosts: number;
+    numberOfActivePosts: number;
+    numberOfPendingPosts: number;
+    numberOfDeletedPosts: number;
+    numberOfCategories: number;
+    numberOfActiveCategories: number;
+    numberOfPendingCategories: number;
+    numberOfDeletedCategories: number;
+    
 }

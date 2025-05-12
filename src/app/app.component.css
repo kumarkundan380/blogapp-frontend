@@ -1,0 +1,55 @@
+
+:host {
+  display: block;
+  height: 100%;
+}
+    
+.app-container {
+  display: block;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+    
+/* Header */
+app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  z-index: 1000;
+  background-color: var(--card-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--text-color);
+}
+    
+/* Content Area */
+.content-wrapper {
+  margin-top: 60px;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+    
+/* Footer */
+app-footer {
+  flex-shrink: 0;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  padding: 1rem;
+  text-align: center;
+}
+    
+/* Theme Toggle Button Positioning (optional styling) */
+.theme-toggle {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  z-index: 999;
+}
+    

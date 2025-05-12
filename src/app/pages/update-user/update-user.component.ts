@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { User } from 'src/app/model/user';
+import { Gender, User, UserStatus } from 'src/app/model/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 
@@ -14,173 +14,242 @@ import { UserService } from 'src/app/services/user.service';
 export class UpdateUserComponent implements OnInit {
 
   updateUserForm!: FormGroup;
-  user!: User;
-  userId!:number;
-  selectedFile: File | null = null;
-  file!:Blob;
-  imageSrc: string | ArrayBuffer | null | undefined = null;
-  isAdmin!:boolean;
-  userVerified!:string;
-  profileImage!:string;
+  userId: number = -1;
+  file?: File;
+  imageSrc: string | ArrayBuffer | null = "../../../assets/profile.png";
+  isSuperAdmin: boolean = false;
+  isAdmin: boolean = false;
+  userStatuses = Object.values(UserStatus);
+  genders = Object.values(Gender);
+  originalUser!: User;
+  formChanged = false;
+  selectedFileName: string = '';
+
 
   constructor(private activateRoute: ActivatedRoute,
     private authService : AuthService,
     private userService : UserService, 
     private router: Router,
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar){
+    private snackBar: MatSnackBar){
     
   }
 
   ngOnInit(): void {
-    this.imageSrc = "../../../assets/profile.png";
-    this.profileImage = "../../../assets/profile.png";
+
     this.userId = this.activateRoute.snapshot.params['userId'];
-    this.isAdmin = this.authService.isAdminUser(this.authService.getUserInfo());
+    const useInfo = this.authService.getUserInfo()!;
+    this.isSuperAdmin = this.authService.isSuperAdminUser(useInfo);
+    this.isAdmin = this.authService.isAdminUser(useInfo);
+
+     // Initialize Form
+     this.initializeForm();
+
+     // Fetch User Data
     this.userService.getUser(this.userId).subscribe({
-      next: (data) => {
-        this.user = data.body;
-        if(this.isAdmin){
-          this.updateUserForm.patchValue({
-            userName: this.user.userName,
-            firstName: this.user.firstName,
-            middleName: this.user.middleName,
-            lastName: this.user.lastName,
-            phoneNumber: this.user.phoneNumber,
-            gender: this.user.gender,
-            about: this.user.about,
-            userStatus: this.user.userStatus,
-            userVerified: this.user.isVerified?"YES":"NO",
-          });
-        } else {
-          this.updateUserForm.patchValue({
-            userName: this.user.userName,
-            firstName: this.user.firstName,
-            middleName: this.user.middleName,
-            lastName: this.user.lastName,
-            phoneNumber: this.user.phoneNumber,
-            gender: this.user.gender,
-            about: this.user.about,
-          });
-        }
-        if(this.user.userImage){
-          this.imageSrc = this.user.userImage;
-          this.profileImage = this.user.userImage;
-        }
+      next: (response) => {
+        this.originalUser = response.body;
+        this.populateForm(response.body)
       },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
-    })
-    if(this.isAdmin){
-      this.updateUserForm = this.formBuilder.group({
-        userName: new FormControl('', Validators.required),
-        firstName: new FormControl('', Validators.required),
-        middleName: new FormControl(''),
-        lastName: new FormControl(''),
-        phoneNumber: new FormControl('', Validators.required),
-        gender: new FormControl('',Validators.required),
-        about: new FormControl('', Validators.required),
-        userStatus: new FormControl('', Validators.required),
-        userVerified: new FormControl('', Validators.required),
-      });
-    } else {
-      this.updateUserForm = this.formBuilder.group({
-        userName: new FormControl('', Validators.required),
-        firstName: new FormControl('', Validators.required),
-        middleName: new FormControl(''),
-        lastName: new FormControl(''),
-        phoneNumber: new FormControl('', Validators.required),
-        gender: new FormControl('',Validators.required),
-        about: new FormControl('', Validators.required),
-      });
-    }
+      error: (error) => this.showSnackbar(error.error.errorMessage)
+    });
+
+  }
+
+  // Initialize the form with validation
+  private initializeForm(): void {
     
-  }
-
-  onSubmit(){
-    if(this.isAdmin){
-      this.user = {
-        userName:this.updateUserForm.get('userName')?.value,
-        firstName:this.updateUserForm.get('firstName')?.value,
-        middleName:this.updateUserForm.get('middleName')?.value,
-        lastName:this.updateUserForm.get('lastName')?.value,
-        phoneNumber:this.updateUserForm.get('phoneNumber')?.value,
-        gender:this.updateUserForm.get('gender')?.value,
-        about:this.updateUserForm.get('about')?.value,
-        userStatus:this.updateUserForm.get('userStatus')?.value,
-        isVerified:this.updateUserForm.get('userVerified')?.value=="YES"?true:false,
-      }
-    } else {
-      this.user = {
-        userName:this.updateUserForm.get('userName')?.value,
-        firstName:this.updateUserForm.get('firstName')?.value,
-        middleName:this.updateUserForm.get('middleName')?.value,
-        lastName:this.updateUserForm.get('lastName')?.value,
-        phoneNumber:this.updateUserForm.get('phoneNumber')?.value,
-        gender:this.updateUserForm.get('gender')?.value,
-        about:this.updateUserForm.get('about')?.value,
-      }
-    }
-    this.updateUser();
-  }
-
-  onFileSelected(event: any) {
-    this.file = event.target.files[0];
-    if (this.file) {
-      this.selectedFile = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.imageSrc = e.target?.result;
-      };
-      reader.readAsDataURL(this.file);
-    }
-  }
-
-  updateUser(){
-    let formData = new FormData();
-    formData.append("image", this.file);
-    formData.append("userData",JSON.stringify(this.user));
-    this.userService.updateUser(formData,this.userId).subscribe({
-      next: (data) => {
-          this.user = data.body;
-          if(this.authService.isSameUser(data.body.userId!)){
-            this.authService.setUser(JSON.stringify(data.body))
-            if(data.body.userImage){
-              this.authService.profileImageSubject.next(data.body.userImage!);
-            }
-            
-          }
-          this._snackBar.open(data.message, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-        this.updateUserForm.reset();
-        if(this.isAdmin){
-          this.router.navigate(['/admin/profile']);
-        } else{
-          this.router.navigate(['/profile']);
-        }
-      },
-      error: (error) => {
-        this._snackBar.open(error.error.errorMessage, "OK", {
-          duration: 3000,
-          verticalPosition: 'top'
-        })
-      }
+    this.updateUserForm = this.formBuilder.group({
+      userName: ['', Validators.required],
+      firstName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      middleName: [''],
+      lastName: [''],
+      phoneNumber: ['', Validators.required],
+      gender: ['', Validators.required],
+      about: ['', Validators.required],
+      ...(this.isAdmin && { 
+        status: ['', Validators.required],
+        emailVerified: ['', Validators.required]
+      })
     });
   }
 
-  updateRole(){
+   // Populate form fields with user data
+   private populateForm(user: User): void {
+    
+    if (!user) return;
+
+    this.updateUserForm.patchValue({
+      userName: user.userName,
+      firstName: user.firstName,
+      middleName: user.middleName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      gender: user.gender,
+      about: user.about,
+      ...(this.isAdmin && {
+        status: user.status,
+        emailVerified: user.emailVerified ? "YES" : "NO"
+      })
+    });
+
+    this.updateUserForm.valueChanges.subscribe(() => {
+      this.formChanged = !this.isFormUnchanged();
+    });
+
+      // Set Profile Image
+    if (user.userImage) {
+      this.imageSrc = user.userImage;
+    }
+  }
+
+   // Handle file selection
+   onFileSelected(event: any): void {
+
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.file = input.files[0];
+      this.selectedFileName = this.file.name;
+      const reader = new FileReader();
+      reader.onload = (e) => this.imageSrc = e.target?.result ?? null;
+      reader.readAsDataURL(this.file);
+    } else {
+      this.file = undefined;
+      this.imageSrc = null;
+    }
+
+    // File selection counts as a change
+    this.formChanged = true;
+  }
+
+  // Handle form submission
+  onSubmit(): void {
+    
+    if (this.updateUserForm.invalid) return;
+
+    // If no changes made and no new file uploaded, don't submit
+    if (this.isFormUnchanged() && !this.file) {
+      this.showSnackbar("No meaningful changes detected.");
+      return;
+    }
+
+    const updatedUser: User = {
+      ...this.updateUserForm.value,
+      emailVerified: (this.isSuperAdmin || this.isAdmin) ? this.updateUserForm.get('emailVerified')?.value === "YES" : undefined
+    };
+
+    this.userService.updateUser(updatedUser, this.userId, this.file).subscribe({
+      next: (response) => this.handleSuccess(response.body),
+      error: (error) => this.showSnackbar(error.error.errorMessage)
+    });
+  }
+
+  private isFormUnchanged(): boolean {
+    
+    const formValue = this.updateUserForm.value;
+  
+    const trim = (val: any) => typeof val === 'string' ? val.trim() : val;
+  
+    const updatedUser: Partial<User> = {
+      userName: trim(formValue.userName),
+      email: trim(formValue.email),
+      firstName: trim(formValue.firstName),
+      middleName: trim(formValue.middleName),
+      lastName: trim(formValue.lastName),
+      phoneNumber: trim(formValue.phoneNumber),
+      gender: trim(formValue.gender),
+      about: trim(formValue.about),
+      ...((this.isSuperAdmin || this.isAdmin) && {
+        status: trim(formValue.status),
+        emailVerified: formValue.emailVerified === "YES"
+      })
+    };
+  
+    const originalUser = {
+      userName: this.originalUser.userName,
+      email: this.originalUser.email,
+      firstName: this.originalUser.firstName,
+      middleName: this.originalUser.middleName,
+      lastName: this.originalUser.lastName,
+      phoneNumber: this.originalUser.phoneNumber,
+      gender: this.originalUser.gender,
+      about: this.originalUser.about,
+      ...((this.isSuperAdmin || this.isAdmin) && {
+        status: this.originalUser.status,
+        emailVerified: this.originalUser.emailVerified
+      })
+    };
+  
+    // Compare JSON stringified versions
+    return JSON.stringify(updatedUser) === JSON.stringify(originalUser);
+  }
+
+  resetForm(): void {
+    if (!this.originalUser) return;
+  
+    this.updateUserForm.patchValue({
+      userName: this.originalUser.userName,
+      firstName: this.originalUser.firstName,
+      middleName: this.originalUser.middleName,
+      lastName: this.originalUser.lastName,
+      email: this.originalUser.email,
+      phoneNumber: this.originalUser.phoneNumber,
+      gender: this.originalUser.gender,
+      about: this.originalUser.about,
+      ...((this.isSuperAdmin || this.isAdmin) && {
+        status: this.originalUser.status,
+        emailVerified: this.originalUser.emailVerified ? "YES" : "NO"
+      })
+    });
+  
+    this.file = undefined;
+    this.imageSrc = this.originalUser.userImage ?? "../../../assets/profile.png";
+    this.selectedFileName = '';
+    this.updateUserForm.markAsPristine();
+    this.updateUserForm.markAsUntouched();
+  }
+  
+  
+
+  // Handle successful update
+  private handleSuccess(updatedUser: User): void {
+    if (this.authService.isSameUser(updatedUser.userId!)) {
+      this.authService.setUser(updatedUser);
+      if (updatedUser.userImage) {
+        this.authService.profileImageSubject.next(updatedUser.userImage);
+      }
+    }
+    
+    this.showSnackbar("User updated successfully!");
+    this.updateUserForm.reset();
+    this.router.navigate([this.isAdmin ? `/admin/profile/${this.userId}` : `/profile/${this.userId}`]);
+  }
+
+   // Show snack bar notification
+   private showSnackbar(message: string): void {
+    
+    this.snackBar.open(message, "OK", {
+      duration: 3000,
+      verticalPosition: 'top'
+    });
+  }
+
+   // Navigate to role update page
+   updateRole(): void {
+    
     this.router.navigate([`/admin/${this.userId}/roles`]);
   }
 
-  updateAddress(){
-    this.router.navigate([`/all-address/${this.userId}`]);
+  // Navigate to address update page
+  updateAddress(): void {
+    
+    if(this.isSuperAdmin || this.isAdmin) {
+      this.router.navigate([`/admin/all-address/${this.userId}`]);
+    } else {
+      this.router.navigate([`/all-address/${this.userId}`]);
+    }
   }
-
 
 }

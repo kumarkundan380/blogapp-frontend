@@ -1,0 +1,138 @@
+/* .confirm-dialog-container {
+    padding: 16px;
+    max-width: 90vw;
+    min-width: 280px;
+    box-sizing: border-box;
+}
+  
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+  
+.dialog-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #37474f;
+}
+  
+.close-icon {
+    cursor: pointer;
+    color: #9e9e9e;
+    transition: color 0.3s ease;
+}
+  
+.close-icon:hover {
+    color: #f44336;
+}
+  
+.dialog-content {
+    text-align: center;
+    font-size: 16px;
+    color: #546e7a;
+    padding: 10px 0;
+}
+  
+.dialog-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+  
+.dialog-actions button {
+    flex: 1 1 45%;
+    height: 48px;
+    font-weight: bold;
+    font-size: 16px;
+} */
+
+.confirm-dialog-container {
+    padding: 16px;
+    max-width: 90vw;
+    min-width: 280px;
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Header with title and close icon */
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .dialog-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #37474f;
+  }
+  
+  .close-icon {
+    cursor: pointer;
+    color: #9e9e9e;
+    transition: color 0.3s ease;
+    font-size: 24px;
+  }
+  
+  .close-icon:hover {
+    color: #f44336;
+  }
+  
+  /* Message content */
+  .dialog-content {
+    text-align: center;
+    font-size: 16px;
+    color: #546e7a;
+    padding: 10px 0;
+    word-wrap: break-word;
+  }
+  
+  /* Button container */
+  .dialog-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .dialog-actions button {
+    flex: 1 1 45%;
+    height: 48px;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 6px;
+  }
+  
+  /* Mobile-specific adjustments */
+  @media (max-width: 480px) {
+    .dialog-title {
+      font-size: 18px;
+    }
+  
+    .dialog-content {
+      font-size: 15px;
+    }
+  
+    .dialog-actions {
+      flex-direction: column;
+    }
+  
+    .dialog-actions button {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+  
+    .dialog-actions button:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  

@@ -1,0 +1,60 @@
+/* Main container layout */
+
+.admin-dashboard-container {
+  display: flex;
+  min-height: 100vh; /* ✅ Fill full height of viewport */
+}
+  
+  
+/* Sidebar styles */
+.sidebar-container {
+  width: 250px;
+  height: calc(100vh - 60px); /* Full height minus header */
+  position: fixed;
+  top: 60px;
+  left: 0;
+  background-color: #f4f4f4;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  padding-top: 10px;
+  transition: transform 0.3s ease-in-out;
+}
+  
+/* Main content */
+.main-content {
+  flex: 1;
+  margin-left: 250px; /* Sidebar space */
+  min-height: 100vh; /* ✅ Ensure it matches viewport */
+  display: flex;
+  flex-direction: column;
+
+}
+
+/* router-outlet {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: block;
+}  */
+
+  
+  
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar-container {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 150;
+  }
+  
+  .sidebar-container.active {
+    transform: translateX(0); /* Slide in sidebar when active */
+  }
+  
+  .main-content {
+    margin-left: 0; /* No offset when sidebar is hidden */
+  }
+}
+
+
+  
