@@ -43,8 +43,8 @@
   </mat-card>
    <!-- Posts -->
   <div class = "mt-5">
-    <h2 *ngIf="posts.content.length > 0" class=" text-center mb-4">All Posts</h2>
-    <div *ngFor="let post of posts.content" class="card mb-4 shadow-sm rounded">
+    <h2 *ngIf="posts && posts.content.length > 0" class=" text-center mb-4">All Posts</h2>
+    <div *ngFor="let post of posts?.content" class="card mb-4 shadow-sm rounded">
       <app-post-card [post]="post"></app-post-card>
     </div>
 
@@ -71,7 +71,7 @@
     </div>
 
     <!-- No Post Message -->
-    <div *ngIf="posts.content.length === 0" class="text-center mt-5">
+    <div *ngIf="posts && posts.content.length === 0" class="text-center mt-5">
       <h4>No Posts Found.</h4>
     </div>
   </div>  

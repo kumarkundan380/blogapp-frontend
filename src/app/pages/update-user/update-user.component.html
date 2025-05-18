@@ -89,7 +89,7 @@
           </div>
   
           <!-- Admin-only Fields -->
-          <ng-container *ngIf="isAdmin">
+          <ng-container *ngIf="isSuperAdmin || isAdmin">
             <div class="row">
               <div class="col-md-6">
                 <!-- Status -->
@@ -135,7 +135,7 @@
               Reset
             </button>
             <button mat-raised-button color="accent" type="button" (click)="updateAddress()">Update Address</button>
-            <button *ngIf="isAdmin" mat-raised-button color="accent" type="button" (click)="updateRole()">Update Role</button>
+            <button *ngIf="isSuperAdmin || isAdmin" mat-raised-button color="accent" type="button" (click)="updateRole()">Update Role</button>
           </div>
         </form>
       </div>

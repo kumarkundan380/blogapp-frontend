@@ -79,6 +79,7 @@ export class HeaderComponent implements OnInit,OnDestroy {
     if (this.isLoggedIn && userInfo) {
       this.userName = userInfo.userName;
       this.isAdmin = this.authService.isAdminUser(userInfo);
+      this.isSuperAdmin = this.authService.isSuperAdminUser(userInfo);
       this.profileImage = userInfo.userImage ?? '';
     }
   }
@@ -90,7 +91,7 @@ export class HeaderComponent implements OnInit,OnDestroy {
     this.isSuperAdmin = false;
   }
 
-  goToHomePage(): void {
+  goToHomePage(): void { 
     if (this.isLoggedIn && (this.isSuperAdmin || this.isAdmin)) {
       this.router.navigate(['/admin']);
     } else {
@@ -109,6 +110,14 @@ export class HeaderComponent implements OnInit,OnDestroy {
     } else {
       this.router.navigate(['/posts']);
     }
+  }
+
+  goToAboutUsPage(): void {
+    this.router.navigate([`/about-us`]);
+  }
+
+  goToContactUsPage(): void {
+    this.router.navigate(['/contact-us']);
   }
 
   logOut(): void {

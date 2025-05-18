@@ -26,6 +26,10 @@ import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 import { HomeRedirectComponent } from './pages/home-redirect/home-redirect.component';
 import { NoAuthGuard } from './guards/no-auth.guard';
+import { AboutUsComponent } from './pages/about-us/about-us.component';
+import { ContactUsComponent } from './pages/contact-us/contact-us.component';
+import { ThankYouComponent } from './pages/thank-you/thank-you.component';
+import { ContactMessageComponent } from './pages/contact-message/contact-message.component';
 
 
 const routes: Routes = [
@@ -46,6 +50,20 @@ const routes: Routes = [
     component: LoginComponent
     // canActivate: [NoAuthGuard]
   },
+  { 
+    path: 'about-us', 
+    component: AboutUsComponent 
+  },
+  { 
+    path: 'contact-us', 
+    component: ContactUsComponent,
+    canActivate: [LoginGuard] 
+  },
+  { 
+    path: 'thank-you', 
+    component: ThankYouComponent,
+    canActivate: [LoginGuard] 
+  },
   {
     path: 'posts/:slug',
     component: PostPreviewComponent
@@ -65,7 +83,7 @@ const routes: Routes = [
   {
     path:'profile/:userId',
     component: ProfileComponent,
-    canActivate: [LoginGuard],
+    canActivate: [LoginGuard]
   },
   {
     path: 'admin',
@@ -75,16 +93,17 @@ const routes: Routes = [
     children: [
       { path: '', component: AdminHomeComponent },
       { path: 'user-list', component: UserListComponent },
-      { path: 'update-user/:userId', component: UpdateUserComponent},
-      { path: 'all-address/:userId', component: AddressComponent},
+      { path: 'update-user/:userId', component: UpdateUserComponent },
+      { path: 'all-address/:userId', component: AddressComponent },
       { path: 'add-address/:userId', component: AddAddressComponent},
-      { path: 'edit-address/:userId/:addressId', component: EditAddressComponent},
+      { path: 'edit-address/:userId/:addressId', component: EditAddressComponent },
       { path: ':userId/roles', component: RolesComponent },
       { path: 'profile/:userId', component: ProfileComponent },
       { path: 'categories', component: CategoriesComponent },
       { path: 'add-category', component: AddCategoryComponent },
       { path: 'update-category/:categoryId', component: UpdateCategoryComponent },
-      { path: 'posts', component: PostsComponent }
+      { path: 'posts', component: PostsComponent },
+      { path: 'contact-messages', component: ContactMessageComponent }
     ]
   },
   {

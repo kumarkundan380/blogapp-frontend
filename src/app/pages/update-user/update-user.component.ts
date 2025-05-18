@@ -14,7 +14,7 @@ import { UserService } from 'src/app/services/user.service';
 export class UpdateUserComponent implements OnInit {
 
   updateUserForm!: FormGroup;
-  userId: number = -1;
+  userId!: number;
   file?: File;
   imageSrc: string | ArrayBuffer | null = "../../../assets/profile.png";
   isSuperAdmin: boolean = false;
@@ -31,13 +31,11 @@ export class UpdateUserComponent implements OnInit {
     private userService : UserService, 
     private router: Router,
     private formBuilder: FormBuilder,
-    private snackBar: MatSnackBar){
-    
-  }
+    private snackBar: MatSnackBar){}
 
   ngOnInit(): void {
 
-    this.userId = this.activateRoute.snapshot.params['userId'];
+    this.userId = +this.activateRoute.snapshot.params['userId'];
     const useInfo = this.authService.getUserInfo()!;
     this.isSuperAdmin = this.authService.isSuperAdminUser(useInfo);
     this.isAdmin = this.authService.isAdminUser(useInfo);
@@ -68,7 +66,7 @@ export class UpdateUserComponent implements OnInit {
       phoneNumber: ['', Validators.required],
       gender: ['', Validators.required],
       about: ['', Validators.required],
-      ...(this.isAdmin && { 
+      ...((this.isSuperAdmin || this.isAdmin) && { 
         status: ['', Validators.required],
         emailVerified: ['', Validators.required]
       })
@@ -89,7 +87,7 @@ export class UpdateUserComponent implements OnInit {
       phoneNumber: user.phoneNumber,
       gender: user.gender,
       about: user.about,
-      ...(this.isAdmin && {
+      ...((this.isSuperAdmin || this.isAdmin) && {
         status: user.status,
         emailVerified: user.emailVerified ? "YES" : "NO"
       })
@@ -100,16 +98,15 @@ export class UpdateUserComponent implements OnInit {
     });
 
       // Set Profile Image
-    if (user.userImage) {
+    if (user?.userImage) {
       this.imageSrc = user.userImage;
     }
   }
 
    // Handle file selection
    onFileSelected(event: any): void {
-
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
+    if (input.files && input.files.length) {
       this.file = input.files[0];
       this.selectedFileName = this.file.name;
       const reader = new FileReader();
@@ -119,7 +116,6 @@ export class UpdateUserComponent implements OnInit {
       this.file = undefined;
       this.imageSrc = null;
     }
-
     // File selection counts as a change
     this.formChanged = true;
   }
@@ -203,15 +199,12 @@ export class UpdateUserComponent implements OnInit {
         emailVerified: this.originalUser.emailVerified ? "YES" : "NO"
       })
     });
-  
     this.file = undefined;
     this.imageSrc = this.originalUser.userImage ?? "../../../assets/profile.png";
     this.selectedFileName = '';
     this.updateUserForm.markAsPristine();
     this.updateUserForm.markAsUntouched();
   }
-  
-  
 
   // Handle successful update
   private handleSuccess(updatedUser: User): void {
@@ -224,7 +217,7 @@ export class UpdateUserComponent implements OnInit {
     
     this.showSnackbar("User updated successfully!");
     this.updateUserForm.reset();
-    this.router.navigate([this.isAdmin ? `/admin/profile/${this.userId}` : `/profile/${this.userId}`]);
+    this.router.navigate([(this.isSuperAdmin || this.isAdmin) ? `/admin/profile/${this.userId}` : `/profile/${this.userId}`]);
   }
 
    // Show snack bar notification

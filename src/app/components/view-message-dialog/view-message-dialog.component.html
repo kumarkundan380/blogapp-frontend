@@ -1,0 +1,23 @@
+<!-- <h2 mat-dialog-title>Message</h2>
+<mat-dialog-content>
+  <p>{{ data.message }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close color="primary">Close</button>
+</mat-dialog-actions> -->
+
+
+<div class="view-dialog-container">
+  <div class="dialog-header">
+    <span class="dialog-title">Message</span>
+    <mat-icon class="close-icon" (click)="closeDialog()" aria-label="Close dialog">close</mat-icon>
+  </div>
+
+  <div class="dialog-content">
+    <p>{{ data.message }}</p>
+  </div>
+
+  <div class="dialog-actions">
+    <button mat-flat-button color="primary" mat-dialog-close>Close</button>
+  </div>
+</div>

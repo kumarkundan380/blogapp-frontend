@@ -48,7 +48,7 @@
         </mat-form-field>
   
         <!-- Admin Only: Status -->
-        <mat-form-field class="w-100 mb-4" appearance="outline" *ngIf="isAdmin">
+        <mat-form-field class="w-100 mb-4" appearance="outline" *ngIf="isSuperAdmin || isAdmin">
             <mat-label>Update Status</mat-label>
             <mat-select formControlName="status">
                 <mat-option *ngFor="let status of statusList" [value]="status">{{ status }}</mat-option>

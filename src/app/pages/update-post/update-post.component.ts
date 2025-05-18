@@ -45,7 +45,7 @@ export class UpdatePostComponent {
     private postService: PostService,
     private router: Router,
     private formBuilder: FormBuilder,
-    private _snackBar: MatSnackBar
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -111,27 +111,37 @@ export class UpdatePostComponent {
   private isFormUnchanged(): boolean {
     
     const formValue = this.updatePostForm.value;
-  
-    const trim = (val: any) => typeof val === 'string' ? val.trim() : val;
-  
+
+    const getNormalizedText = (html: string): string => {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+    
+      // Get visible text content
+      let text = div.textContent || '';
+    
+      // Trim and normalize internal spacing: collapse multiple spaces into one
+      return text.replace(/\s+/g, ' ').trim();
+    };
+
+    const trim = (val: any) => typeof val === 'string' ? getNormalizedText(val) : val;
+
     const updatedPost: Partial<Post> = {
       postTitle: trim(formValue.postTitle),
       postContent: trim(formValue.postContent),
-      categoryId: trim(formValue.categoryId),
+      categoryId: formValue.categoryId,
       ...((this.isSuperAdmin || this.isAdmin) && {
         status: trim(formValue.status)
       })
     };
-    
+     
     const originalPost = {
       postTitle: this.post.postTitle,
-      postContent: this.post.postContent,
+      postContent: getNormalizedText(this.post.postContent),
       categoryId: this.post.category?.categoryId,
       ...((this.isSuperAdmin || this.isAdmin) && {
         status: this.post.status
       })
     };
-    // Compare JSON stringified versions
     return JSON.stringify(updatedPost) === JSON.stringify(originalPost);
   }
 
@@ -164,7 +174,22 @@ export class UpdatePostComponent {
   }
 
   onReset(): void {
-    this.populateForm(this.post);
+  //  this.populateForm(this.post);
+
+  if (!this.post) return;
+
+  this.updatePostForm.patchValue({
+    postTitle: this.post.postTitle,
+    postContent: this.post.postContent,
+    categoryId: this.post.category?.categoryId,
+    ...((this.isSuperAdmin || this.isAdmin) && { status: this.post?.status})
+  });
+  this.imageSrc = this.post.imageUrl ? this.post.imageUrl : null;
+  this.selectedFileName = '';
+  this.updatePostForm.markAsPristine();
+  this.updatePostForm.markAsUntouched();
+
+
   }
 
   // Handle file selection
@@ -203,7 +228,7 @@ export class UpdatePostComponent {
   }
 
   private showMessage(message: string): void {
-    this._snackBar.open(message, 'OK', {
+    this.snackBar.open(message, 'OK', {
       duration: 3000,
       verticalPosition: 'top'
     });

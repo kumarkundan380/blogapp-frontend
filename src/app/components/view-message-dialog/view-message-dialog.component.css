@@ -1,5 +1,4 @@
-
-.confirm-dialog-container {
+.view-dialog-container {
     padding: 16px;
     max-width: 90vw;
     min-width: 280px;
@@ -46,21 +45,18 @@
   /* Button container */
   .dialog-actions {
     display: flex;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: center;
     margin-top: 20px;
-    flex-wrap: wrap;
   }
   
   .dialog-actions button {
-    flex: 1 1 45%;
     height: 48px;
     font-weight: 600;
     font-size: 15px;
     border-radius: 6px;
   }
   
-  /* Mobile-specific adjustments */
+  /* Responsive adjustments */
   @media (max-width: 480px) {
     .dialog-title {
       font-size: 18px;
@@ -71,17 +67,11 @@
     }
   
     .dialog-actions {
-      flex-direction: column;
+      justify-content: center;
     }
   
     .dialog-actions button {
       width: 100%;
-      margin-bottom: 8px;
     }
-  
-    .dialog-actions button:last-child {
-      margin-bottom: 0;
-    }
-  }
-  
+}
   

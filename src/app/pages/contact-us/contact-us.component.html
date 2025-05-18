@@ -1,0 +1,55 @@
+<div class="contact-container">
+  <mat-card class="contact-card">
+    <mat-card-header>
+      <mat-card-title>
+        <h2>📬 Contact Us</h2>
+      </mat-card-title>
+      <mat-card-subtitle>
+        We'd love to hear from you. Fill out the form below and we'll get back to you shortly!
+      </mat-card-subtitle>
+    </mat-card-header>
+  
+    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+      <div class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" placeholder="Your Name">
+          <mat-error *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="Your Email" type="email">
+          <mat-error *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+            Valid email is required
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Subject</mat-label>
+          <input matInput formControlName="subject" placeholder="Subject">
+          <mat-error *ngIf="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched">
+            Subject is required
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Message</mat-label>
+          <textarea matInput formControlName="message" placeholder="Write your message..." rows="5"></textarea>
+          <mat-error *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+            Message is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <div class="button-row">
+        <button mat-raised-button color="primary" type="submit" [disabled]="contactForm.invalid">
+          <mat-icon>send</mat-icon>&nbsp; Send Message
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>
+  

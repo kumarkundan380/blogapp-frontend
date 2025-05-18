@@ -41,6 +41,11 @@ import { VerifyEmailComponent } from './pages/verify-email/verify-email.componen
 import { StripHtmlPipe } from './strip-html.pipe';
 import { HomeRedirectComponent } from './pages/home-redirect/home-redirect.component';
 import { PostCardComponent } from './pages/post-card/post-card.component';
+import { AboutUsComponent } from './pages/about-us/about-us.component';
+import { ContactUsComponent } from './pages/contact-us/contact-us.component';
+import { ThankYouComponent } from './pages/thank-you/thank-you.component';
+import { ContactMessageComponent } from './pages/contact-message/contact-message.component';
+import { ViewMessageDialogComponent } from './components/view-message-dialog/view-message-dialog.component';
 
 
 @NgModule({
@@ -74,7 +79,12 @@ import { PostCardComponent } from './pages/post-card/post-card.component';
     VerifyEmailComponent,
     StripHtmlPipe,
     HomeRedirectComponent,
-    PostCardComponent
+    PostCardComponent,
+    AboutUsComponent,
+    ContactUsComponent,
+    ThankYouComponent,
+    ContactMessageComponent,
+    ViewMessageDialogComponent
   ],
   imports: [
     BrowserModule,

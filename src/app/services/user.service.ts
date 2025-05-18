@@ -93,7 +93,7 @@ export class UserService {
     return this.httpClient.put<BlogAppResponse<User>>(`${this.BASE_URL}/${userId}/addresses/${addressId}`, address);
   }
 
-  getOneAddress(userId: number, addressId:number) : Observable<BlogAppResponse<Address>> {
+  getUserAddress(userId: number, addressId:number) : Observable<BlogAppResponse<Address>> {
     return this.httpClient.get<BlogAppResponse<Address>>(`${this.BASE_URL}/${userId}/addresses/${addressId}`);
   }
 

@@ -60,7 +60,7 @@ export class EditAddressComponent implements OnInit {
     this.userId = +this.route.snapshot.params['userId'];
     this.addressId = +this.route.snapshot.params['addressId'];
 
-    this.userService.getOneAddress(this.userId, this.addressId).subscribe({
+    this.userService.getUserAddress(this.userId, this.addressId).subscribe({
       next: (response) => {
         this.address = response.body;
         this.populateForm(response.body);
